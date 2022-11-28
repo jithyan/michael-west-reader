@@ -17,5 +17,6 @@
   "devDependencies": {
     "@babel/core": "^7.12.9"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@3.3.0"
 }
