@@ -2,8 +2,13 @@ import { registerRootComponent } from "expo";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import { getLatestStoriesPage } from "./api";
 import { ArticleDescription, parseLatestStoriesPage } from "./parser";
+
+const Stack = createNativeStackNavigator();
 
 async function initalize() {
     const [success, pageBody] = await getLatestStoriesPage();
@@ -29,25 +34,27 @@ export default function App() {
     }, []);
 
     return (
-        <View style={styles.container}>
-            <Show when={loading}>
-                <Text>Loading...</Text>
-            </Show>
-            <Show when={!loading && Boolean(state)}>
-                <>
-                    {state.map(({ id, title, imageURL }) => (
-                        <View key={id}>
-                            <Image
-                                source={{ uri: imageURL }}
-                                style={{ width: 400, height: 200 }}
-                            />
-                            <Text>{title}</Text>
-                        </View>
-                    ))}
-                </>
-            </Show>
-            <StatusBar style="auto" />
-        </View>
+        <NavigationContainer>
+            <View style={styles.container}>
+                <Show when={loading}>
+                    <Text>Loading...</Text>
+                </Show>
+                <Show when={!loading && Boolean(state)}>
+                    <>
+                        {state.map(({ id, title, imageURL }) => (
+                            <View onTouchStart={() => {}} key={id}>
+                                <Image
+                                    source={{ uri: imageURL }}
+                                    style={{ width: 400, height: 200 }}
+                                />
+                                <Text>{title}</Text>
+                            </View>
+                        ))}
+                    </>
+                </Show>
+                <StatusBar style="auto" />
+            </View>
+        </NavigationContainer>
     );
 }
 
