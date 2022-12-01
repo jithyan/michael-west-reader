@@ -18,14 +18,21 @@ function LatestStories() {
     const [latestStories] = useAtom(latestArticlesList);
 
     return (
-        <View className="flex-1 items-center justify-center bg-slate-800">
+        <View className="flex-1 bg-stone-800 ">
             {latestStories.map(({ id, title, imageURL }) => (
-                <View onTouchStart={() => {}} key={id}>
+                <View
+                    className="grid grid-cols-2 gap-1"
+                    onTouchStart={() => {}}
+                    key={id}
+                >
+                    <Text className="text-zinc-300 font-extrabold text-xl">
+                        {title}
+                    </Text>
                     <Image
+                        className="aspect-square"
                         source={{ uri: imageURL }}
-                        style={{ width: 400, height: 200 }}
+                        style={{ width: 100, height: 100 }}
                     />
-                    <Text>{title}</Text>
                 </View>
             ))}
         </View>
@@ -34,7 +41,7 @@ function LatestStories() {
 
 export function Home() {
     return (
-        <View className="flex-1 items-center justify-center bg-slate">
+        <View className="container flex-1 bg-slate">
             <Suspense fallback={<LoadingSpinner />}>
                 <LatestStories />
             </Suspense>
