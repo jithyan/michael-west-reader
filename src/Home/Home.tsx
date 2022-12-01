@@ -18,7 +18,7 @@ function LatestStories() {
     const [latestStories] = useAtom(latestArticlesList);
 
     return (
-        <>
+        <View className="flex-1 items-center justify-center bg-slate-800">
             {latestStories.map(({ id, title, imageURL }) => (
                 <View onTouchStart={() => {}} key={id}>
                     <Image
@@ -28,22 +28,13 @@ function LatestStories() {
                     <Text>{title}</Text>
                 </View>
             ))}
-        </>
+        </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-});
-
 export function Home() {
     return (
-        <View style={styles.container}>
+        <View className="flex-1 items-center justify-center bg-slate">
             <Suspense fallback={<LoadingSpinner />}>
                 <LatestStories />
             </Suspense>
