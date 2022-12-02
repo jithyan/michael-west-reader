@@ -26,8 +26,8 @@ function extractTitleAndURLFromArticle(article: HTMLElement): {
     storyURL: string;
 } {
     const h2Tag = article.querySelector("h2");
-    const title = h2Tag?.textContent;
-    const storyURL = h2Tag?.querySelector("a")?.textContent;
+    const title = h2Tag?.textContent?.trim();
+    const storyURL = h2Tag?.querySelector("a")?.textContent?.trim();
 
     if (!Boolean(title) || !Boolean(storyURL)) {
         throw new Error("Parsing error: Article heading  not present");
@@ -40,24 +40,28 @@ function extractTitleAndURLFromArticle(article: HTMLElement): {
 }
 
 function extractIdFromArticle(article: HTMLElement): string {
-    return article.id;
+    const id = article.id?.trim();
+    if (!id) {
+        throw new Error("Parsing error: Article id not present");
+    }
+    return id;
 }
 
 function extractImageURLFromArticle(article: HTMLElement): string {
     const imgTag = article.querySelector("img");
-    return imgTag.attributes.src ?? "";
+    return imgTag.attributes.src?.trim() ?? "";
 }
 
 function extractSummaryFromArticle(article: HTMLElement): string {
-    return article.querySelector(".entry-summary")?.textContent ?? "";
+    return article.querySelector(".entry-summary")?.textContent?.trim() ?? "";
 }
 
 function extractPublishedDateFromArticle(article: HTMLElement): string {
-    return article.querySelector(".published").textContent ?? "";
+    return article.querySelector(".published").textContent?.trim() ?? "";
 }
 
 function extractAuthorFromArticle(article: HTMLElement): string {
-    return article.querySelector(".author")?.textContent ?? "";
+    return article.querySelector(".author")?.textContent?.trim() ?? "";
 }
 
 export function parseLatestStoriesPage(pageHTML: string): ArticleDescription[] {
