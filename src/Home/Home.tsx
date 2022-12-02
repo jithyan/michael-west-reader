@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
+import { SafeAreaView, ScrollView, Text, View, Image } from "react-native";
 import { atom, useAtom } from "jotai";
 
 import { LoadingSpinner } from "../core/components";
@@ -18,33 +18,39 @@ function LatestStories() {
     const [latestStories] = useAtom(latestArticlesList);
 
     return (
-        <View className="flex-1 bg-stone-800 ">
-            {latestStories.map(({ id, title, imageURL }) => (
+        <ScrollView className="bg-stone-800 ">
+            {latestStories.map(({ id, title, imageURL, author, published }) => (
                 <View
-                    className="grid grid-cols-2 gap-1"
+                    className="flex-initial flex-row "
                     onTouchStart={() => {}}
                     key={id}
                 >
-                    <Text className="text-zinc-300 font-extrabold text-xl">
-                        {title}
-                    </Text>
-                    <Image
-                        className="aspect-square"
-                        source={{ uri: imageURL }}
-                        style={{ width: 100, height: 100 }}
-                    />
+                    <View className="basis-2/3 p-2">
+                        <Text className="text-zinc-300 font-extrabold text-xl">
+                            {title}
+                        </Text>
+                        <View className="flex-initial flex-row">
+                            <Text className="text-zinc-300 font-light text-xs">
+                                {author.trim()}
+                            </Text>
+                            <Text className="text-zinc-300 font-light text-xs">
+                                {published.trim()}
+                            </Text>
+                        </View>
+                    </View>
+                    <Image className="basis-1/3" source={{ uri: imageURL }} />
                 </View>
             ))}
-        </View>
+        </ScrollView>
     );
 }
 
 export function Home() {
     return (
-        <View className="container flex-1 bg-slate">
+        <SafeAreaView className="container">
             <Suspense fallback={<LoadingSpinner />}>
                 <LatestStories />
             </Suspense>
-        </View>
+        </SafeAreaView>
     );
 }
