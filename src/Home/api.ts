@@ -5,11 +5,11 @@ type CategoriesSubPath = "aap-news/" | "latest-posts/";
 type CategoriesFullPath = `${CategoriesBaseUrl}${CategoriesSubPath}`;
 type CategoryFullPathWithPageNumber = `${CategoriesFullPath}page/${number}/`;
 
-export type Category = "news" | "stories";
+export type Category = "news" | "story";
 
 const CategoryToSubPath = {
     news: "aap-news/",
-    stories: "latest-posts/",
+    story: "latest-posts/",
 } as const satisfies Record<Category, CategoriesSubPath>;
 
 function getUrlForCategoryPage(
