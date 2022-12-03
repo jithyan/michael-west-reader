@@ -3,15 +3,22 @@ import { SafeAreaView, FlatList, Text, View, Image } from "react-native";
 import { atom, useAtom } from "jotai";
 
 import { LoadingSpinner } from "../core/components";
-import { getLatestStoriesPage } from "./api";
-import { ArticleDescription, parseLatestStoriesPage } from "./parser";
+import { getLatestArticlesHTMLPageForCategory } from "./api";
+import { ArticleDescription, parseLatestNewsPage } from "./parser";
 
 const latestArticlesList = atom(async (get) => {
-    const [success, pageBody] = await getLatestStoriesPage();
-    if (success) {
-        return parseLatestStoriesPage(pageBody);
-    }
-    return Promise.reject("Failed to fetch latest stories");
+    const articles = await Promise.all([
+        getLatestArticlesHTMLPageForCategory("news").then(
+            (latestNewsPageBody) =>
+                parseLatestNewsPage(latestNewsPageBody, "news")
+        ),
+        getLatestArticlesHTMLPageForCategory("stories").then(
+            (latestStoriesPageBody) =>
+                parseLatestNewsPage(latestStoriesPageBody, "stories")
+        ),
+    ]);
+
+    return articles.flatMap((a) => a);
 });
 
 function Story({ id, title, imageURL, author, published }: ArticleDescription) {

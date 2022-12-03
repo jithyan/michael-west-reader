@@ -1,26 +1,48 @@
-const LATEST_STORIES_BASE_URL = "https://michaelwest.com.au/category/aap-news/";
+import { NetworkError } from "../core/errors";
 
-function getUrlForLatestStoriesPage(pageNumber: number): string {
+type CategoriesBaseUrl = "https://michaelwest.com.au/category/";
+type CategoriesSubPath = "aap-news/" | "latest-posts/";
+type CategoriesFullPath = `${CategoriesBaseUrl}${CategoriesSubPath}`;
+type CategoryFullPathWithPageNumber = `${CategoriesFullPath}page/${number}/`;
+
+export type Category = "news" | "stories";
+
+const CategoryToSubPath = {
+    news: "aap-news/",
+    stories: "latest-posts/",
+} as const satisfies Record<Category, CategoriesSubPath>;
+
+function getUrlForCategoryPage(
+    path: CategoriesFullPath,
+    pageNumber: number
+): CategoryFullPathWithPageNumber | CategoriesFullPath {
     if (typeof pageNumber !== "number" || pageNumber < 1) {
         throw new Error("Unexpected page number: " + pageNumber);
     }
 
     if (pageNumber === 1) {
-        return LATEST_STORIES_BASE_URL;
+        return path;
     }
 
-    return `${LATEST_STORIES_BASE_URL}page/${pageNumber}/`;
+    return `${path}page/${pageNumber}/`;
 }
 
-export async function getLatestStoriesPage(
+export async function getLatestArticlesHTMLPageForCategory(
+    category: keyof typeof CategoryToSubPath,
     page: number = 1
-): Promise<[true, string] | [false, undefined]> {
+): Promise<string> {
     try {
-        const response = await fetch(getUrlForLatestStoriesPage(page));
-        const body = await response.text();
-        return [true, body];
+        const response = await fetch(
+            getUrlForCategoryPage(
+                `https://michaelwest.com.au/category/${CategoryToSubPath[category]}`,
+                page
+            )
+        );
+        return response.text();
     } catch (e) {
-        console.error(e);
-        return [false, undefined];
+        throw new NetworkError(
+            `Error fetching page ${page} for category ${category}`,
+            { cause: e }
+        );
     }
 }

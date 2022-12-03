@@ -1,4 +1,6 @@
 import { parse, HTMLElement } from "node-html-parser";
+import { ParsingError } from "../core/errors";
+import { Category } from "./api";
 
 export interface ArticleDescription {
     title: string;
@@ -8,9 +10,13 @@ export interface ArticleDescription {
     published: string;
     author: string;
     storyURL: string;
+    category: Category;
 }
 
-function parseArticle(article: HTMLElement): ArticleDescription {
+function parseArticle(
+    article: HTMLElement,
+    category: Category
+): ArticleDescription {
     return {
         ...extractTitleAndURLFromArticle(article),
         id: extractIdFromArticle(article),
@@ -18,6 +24,7 @@ function parseArticle(article: HTMLElement): ArticleDescription {
         summary: extractSummaryFromArticle(article),
         published: extractPublishedDateFromArticle(article),
         author: extractAuthorFromArticle(article),
+        category,
     };
 }
 
@@ -64,18 +71,27 @@ function extractAuthorFromArticle(article: HTMLElement): string {
     return article.querySelector(".author")?.textContent?.trim() ?? "";
 }
 
-export function parseLatestStoriesPage(pageHTML: string): ArticleDescription[] {
-    const dom = parse(pageHTML);
-    const articles = dom.querySelectorAll("article") ?? [];
-    const articleIds = new Set<string>();
-    const uniqueArticles: ArticleDescription[] = [];
+export function parseLatestNewsPage(
+    pageHTML: string,
+    category: Category
+): ArticleDescription[] {
+    try {
+        const dom = parse(pageHTML);
+        const articles = dom.querySelectorAll("article") ?? [];
+        const articleIds = new Set<string>();
+        const uniqueArticles: ArticleDescription[] = [];
 
-    for (const article of articles) {
-        const id = extractIdFromArticle(article);
-        if (!articleIds.has(id)) {
-            articleIds.add(id);
-            uniqueArticles.push(parseArticle(article));
+        for (const article of articles) {
+            const id = extractIdFromArticle(article);
+            if (!articleIds.has(id)) {
+                articleIds.add(id);
+                uniqueArticles.push(parseArticle(article, category));
+            }
         }
+        return uniqueArticles;
+    } catch (e) {
+        throw new ParsingError(`Error parsing page for category ${category}`, {
+            cause: e,
+        });
     }
-    return uniqueArticles;
 }
