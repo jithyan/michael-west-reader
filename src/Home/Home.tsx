@@ -6,29 +6,29 @@ import {
     View,
     Image,
     ActivityIndicator,
+    Pressable,
 } from "react-native";
 import { atom, useAtom } from "jotai";
 import { getLatestArticlesHTMLPageForCategory } from "./api";
-import { ArticleDescription, parseLatestNewsPage } from "./parser";
+import { ArticleDescription, parseLatestArticlesHTMLPage } from "./parser";
 import { toSentenceCase } from "../core/util";
-import { Map } from "immutable";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../App";
 
 const latestArticlesList = atom(async (get) => {
     const articles = await Promise.all([
         getLatestArticlesHTMLPageForCategory("news").then(
             (latestNewsPageBody) =>
-                parseLatestNewsPage(latestNewsPageBody, "news")
+                parseLatestArticlesHTMLPage(latestNewsPageBody, "news")
         ),
         getLatestArticlesHTMLPageForCategory("story").then(
             (latestStoriesPageBody) =>
-                parseLatestNewsPage(latestStoriesPageBody, "story")
+                parseLatestArticlesHTMLPage(latestStoriesPageBody, "story")
         ),
     ]);
 
     return articles.flatMap((a) => a);
 });
-
-const articleStatus = atom(Map<string, { pctRead: number }>());
 
 function Story({
     id,
@@ -37,56 +37,67 @@ function Story({
     author,
     published,
     category,
-}: ArticleDescription) {
+    onTouch,
+}: ArticleDescription & { onTouch: () => void }) {
     return (
-        <View
-            className="flex-initial flex-row p-1"
-            onTouchStart={() => {}}
-            key={id}
-        >
-            <View className="basis-2/3">
-                <Text className="text-zinc-200 bg-orange-400 rounded-lg text-center">
-                    {toSentenceCase(category)}
-                </Text>
-                <Text className="text-zinc-300 font-extrabold text-xl p-0.5">
-                    {title}
-                </Text>
-                <View className="flex-initial flex-row">
-                    <Text className="text-zinc-300 font-light text-xs mr-1">
-                        {author}
+        <Pressable onPress={onTouch}>
+            <View className="flex-initial flex-row p-1" key={id}>
+                <View className="basis-2/3">
+                    <Text className="text-zinc-200 bg-orange-400 rounded-lg text-center">
+                        {toSentenceCase(category)}
                     </Text>
-                    <Text className="text-zinc-300 font-light text-xs">
-                        {published}
+                    <Text className="text-zinc-300 font-extrabold text-xl p-0.5">
+                        {title}
                     </Text>
+                    <View className="flex-initial flex-row">
+                        <Text className="text-zinc-300 font-light text-xs mr-1">
+                            {author}
+                        </Text>
+                        <Text className="text-zinc-300 font-light text-xs">
+                            {published}
+                        </Text>
+                    </View>
+                </View>
+                <View className="basis-1/3 p-1">
+                    <Image
+                        className="aspect-square rounded-md"
+                        source={{ uri: imageURL }}
+                    />
                 </View>
             </View>
-            <View className="basis-1/3 p-1">
-                <Image
-                    className="aspect-square rounded-md"
-                    source={{ uri: imageURL }}
-                />
-            </View>
-        </View>
+        </Pressable>
     );
 }
 
-function LatestArticles() {
+function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
     const [latestStories] = useAtom(latestArticlesList);
 
     return (
         <FlatList
             data={latestStories}
-            renderItem={({ item }) => <Story {...item} />}
+            renderItem={({ item }) => (
+                <Story
+                    {...item}
+                    onTouch={() => {
+                        navigation.navigate("Article", {
+                            id: item.id,
+                            storyURL: item.storyURL,
+                        });
+                    }}
+                />
+            )}
             keyExtractor={(item) => item.id}
         />
     );
 }
 
-export function Home() {
+type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
+
+export function Home({ route, navigation }: HomeProps) {
     return (
         <SafeAreaView className="container bg-stone-800">
             <Suspense fallback={<ActivityIndicator size="large" />}>
-                <LatestArticles />
+                <LatestArticles navigation={navigation} />
             </Suspense>
         </SafeAreaView>
     );

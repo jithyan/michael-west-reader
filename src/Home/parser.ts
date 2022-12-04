@@ -2,6 +2,30 @@ import { parse, HTMLElement } from "node-html-parser";
 import { ParsingError } from "../core/errors";
 import { Category } from "./api";
 
+class Article implements ArticleDescription {
+    readonly title: string;
+    readonly id: string;
+    readonly imageURL: string;
+    readonly summary: string;
+    readonly published: string;
+    readonly author: string;
+    readonly storyURL: string;
+    readonly category: Category;
+
+    constructor(article: HTMLElement, category: Category) {
+        const { storyURL, title } = extractTitleAndURLFromArticle(article);
+
+        this.title = title;
+        this.id = extractIdFromArticle(article);
+        this.storyURL = storyURL;
+        this.imageURL = extractImageURLFromArticle(article);
+        this.summary = extractSummaryFromArticle(article);
+        this.published = extractPublishedDateFromArticle(article);
+        this.author = extractAuthorFromArticle(article);
+        this.category = category;
+    }
+}
+
 export interface ArticleDescription {
     title: string;
     id: string;
@@ -17,15 +41,7 @@ function parseArticle(
     article: HTMLElement,
     category: Category
 ): ArticleDescription {
-    return {
-        ...extractTitleAndURLFromArticle(article),
-        id: extractIdFromArticle(article),
-        imageURL: extractImageURLFromArticle(article),
-        summary: extractSummaryFromArticle(article),
-        published: extractPublishedDateFromArticle(article),
-        author: extractAuthorFromArticle(article),
-        category,
-    };
+    return new Article(article, category);
 }
 
 function extractTitleAndURLFromArticle(article: HTMLElement): {
@@ -71,7 +87,7 @@ function extractAuthorFromArticle(article: HTMLElement): string {
     return article.querySelector(".author")?.textContent?.trim() ?? "";
 }
 
-export function parseLatestNewsPage(
+export function parseLatestArticlesHTMLPage(
     pageHTML: string,
     category: Category
 ): ArticleDescription[] {
