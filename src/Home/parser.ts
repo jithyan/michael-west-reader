@@ -50,7 +50,7 @@ function extractTitleAndURLFromArticle(article: HTMLElement): {
 } {
     const h2Tag = article.querySelector("h2");
     const title = h2Tag?.textContent?.trim();
-    const storyURL = h2Tag?.querySelector("a")?.textContent?.trim();
+    const storyURL = h2Tag?.querySelector("a").getAttribute("href");
 
     if (!Boolean(title) || !Boolean(storyURL)) {
         throw new Error("Parsing error: Article heading  not present");
