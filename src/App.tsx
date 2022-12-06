@@ -9,15 +9,27 @@ const Stack = createNativeStackNavigator();
 
 export type RootStackParamList = {
     Home: undefined;
-    Article: Pick<ArticleDescription, "id" | "storyURL">;
+    Article: Pick<ArticleDescription, "id" | "storyURL" | "title">;
 };
 
 export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator>
-                <Stack.Screen name="Home" component={Home} />
-                <Stack.Screen name="Article" component={Article} />
+                <Stack.Screen
+                    name="Home"
+                    component={Home}
+                    options={{
+                        header: () => <></>,
+                    }}
+                />
+                <Stack.Screen
+                    name="Article"
+                    component={Article}
+                    options={{
+                        headerTitle: "",
+                    }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

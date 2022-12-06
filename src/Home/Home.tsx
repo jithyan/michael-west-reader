@@ -82,6 +82,7 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
                         navigation.navigate("Article", {
                             id: item.id,
                             storyURL: item.storyURL,
+                            title: item.title,
                         });
                     }}
                 />
