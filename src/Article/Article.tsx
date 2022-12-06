@@ -101,7 +101,7 @@ const options: HTMLReactParserOptions = {
 
                 case "p":
                     return (
-                        <Text className="text-md font-normal mb-2 p-2">
+                        <Text className=" text-base font-normal mb-2 p-2">
                             {parseChildren()}
                         </Text>
                     );
@@ -139,7 +139,7 @@ async function parseArticle(storyURL: string) {
         div.toString(),
         options
     ) as JSX.Element;
-
+    console.log("Array slice", React.Children.toArray(restOfBody).slice(0, 3));
     return (
         <>
             <View>{coverImage}</View>
