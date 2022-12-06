@@ -1,7 +1,13 @@
-import { Text, Image } from "react-native";
+import Spinner from "react-native-loading-spinner-overlay/lib";
 
-export function LoadingSpinner({ text = "Loading..." }: { text?: string }) {
-    return <Text>{text}</Text>;
+export function LoadingSpinner({
+    text = "Loading...",
+    visible = true,
+}: {
+    text: string;
+    visible?: boolean;
+}) {
+    return <Spinner visible={visible} textContent={text} />;
 }
 
 export function Show({

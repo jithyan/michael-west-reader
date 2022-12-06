@@ -5,29 +5,32 @@ import {
     Text,
     View,
     Image,
-    ActivityIndicator,
     Pressable,
 } from "react-native";
-import { atom, useAtom } from "jotai";
+import { selector, useRecoilValue } from "recoil";
 import { getLatestArticlesHTMLPageForCategory } from "./api";
 import { ArticleDescription, parseLatestArticlesHTMLPage } from "./parser";
 import { toSentenceCase } from "../core/util";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
+import { LoadingSpinner } from "../core/components";
 
-const latestArticlesList = atom(async (get) => {
-    const articles = await Promise.all([
-        getLatestArticlesHTMLPageForCategory("news").then(
-            (latestNewsPageBody) =>
-                parseLatestArticlesHTMLPage(latestNewsPageBody, "news")
-        ),
-        getLatestArticlesHTMLPageForCategory("story").then(
-            (latestStoriesPageBody) =>
-                parseLatestArticlesHTMLPage(latestStoriesPageBody, "story")
-        ),
-    ]);
+const latestArticlesList = selector({
+    key: "latestArticlesList",
+    get: async () => {
+        const articles = await Promise.all([
+            getLatestArticlesHTMLPageForCategory("news").then(
+                (latestNewsPageBody) =>
+                    parseLatestArticlesHTMLPage(latestNewsPageBody, "news")
+            ),
+            getLatestArticlesHTMLPageForCategory("story").then(
+                (latestStoriesPageBody) =>
+                    parseLatestArticlesHTMLPage(latestStoriesPageBody, "story")
+            ),
+        ]);
 
-    return articles.flatMap((a) => a);
+        return articles.flatMap((a) => a);
+    },
 });
 
 function Story({
@@ -70,7 +73,7 @@ function Story({
 }
 
 function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
-    const [latestStories] = useAtom(latestArticlesList);
+    const latestStories = useRecoilValue(latestArticlesList);
 
     return (
         <FlatList
@@ -97,7 +100,9 @@ type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
 export function Home({ route, navigation }: HomeProps) {
     return (
         <SafeAreaView className="container bg-stone-800">
-            <Suspense fallback={<ActivityIndicator size="large" />}>
+            <Suspense
+                fallback={<LoadingSpinner text="Fetching latest articles..." />}
+            >
                 <LatestArticles navigation={navigation} />
             </Suspense>
         </SafeAreaView>

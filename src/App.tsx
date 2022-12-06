@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Home } from "./Home/Home";
 import { Article } from "./Article/Article";
 import { ArticleDescription } from "./Home/parser";
+import { RecoilRoot } from "recoil";
 
 const Stack = createNativeStackNavigator();
 
@@ -14,24 +15,26 @@ export type RootStackParamList = {
 
 export default function App() {
     return (
-        <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{
-                        header: () => <></>,
-                    }}
-                />
-                <Stack.Screen
-                    name="Article"
-                    component={Article}
-                    options={{
-                        headerTitle: "",
-                    }}
-                />
-            </Stack.Navigator>
-        </NavigationContainer>
+        <RecoilRoot>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen
+                        name="Home"
+                        component={Home}
+                        options={{
+                            header: () => <></>,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="Article"
+                        component={Article}
+                        options={{
+                            headerTitle: "",
+                        }}
+                    />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </RecoilRoot>
     );
 }
 

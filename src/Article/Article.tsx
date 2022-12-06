@@ -1,15 +1,15 @@
-import { atom } from "jotai";
 import { View, Image, Text, ScrollView } from "react-native";
-import { Map } from "immutable";
 import parse, { NodeType } from "node-html-parser";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import htmlToReactParser, {
     HTMLReactParserOptions,
     Element,
     domToReact,
 } from "html-react-parser";
+import { selectorFamily, useRecoilValue } from "recoil";
+import { LoadingSpinner } from "../core/components";
 
 const options: HTMLReactParserOptions = {
     replace: (domNode) => {
@@ -43,6 +43,9 @@ const options: HTMLReactParserOptions = {
                     return <Text>{parseChildren()}</Text>;
 
                 case "a":
+                    if ((domNode.firstChild as any)?.name === "img") {
+                        return <>{parseChildren()}</>;
+                    }
                     return (
                         <Text className="text-sky-600 underline">
                             {parseChildren()}
@@ -112,16 +115,19 @@ const options: HTMLReactParserOptions = {
     },
 };
 
-const article = atom(
-    Map<string, { pctRead: number; parsedElements: JSX.Element }>()
-);
+const getParsedArticleFromURLSelector = selectorFamily({
+    key: "parsedArticle",
+    get: (storyURL: string) => async () => {
+        return parseArticle(storyURL);
+    },
+});
 
 async function parseArticle(storyURL: string) {
     const response = await fetch(storyURL);
     const dom = parse(await response.text());
     const div = dom.getElementById("old-post");
 
-    const img = htmlToReactParser(
+    const coverImage = htmlToReactParser(
         dom
             .querySelector(".featured-image")
             .getElementsByTagName("img")
@@ -129,42 +135,40 @@ async function parseArticle(storyURL: string) {
         options
     ) as JSX.Element;
 
-    const a = htmlToReactParser(div.toString(), options) as JSX.Element;
+    const restOfBody = htmlToReactParser(
+        div.toString(),
+        options
+    ) as JSX.Element;
 
     return (
         <>
-            <View>{img}</View>
-            <View>{a}</View>
+            <View>{coverImage}</View>
+            <View>{restOfBody}</View>
         </>
     );
+}
+
+function ArticleBody({ storyURL }: { storyURL: string }) {
+    return useRecoilValue(getParsedArticleFromURLSelector(storyURL));
 }
 
 type ArticleProps = NativeStackScreenProps<RootStackParamList, "Article">;
 
 export function Article({ route }: ArticleProps) {
     const { storyURL, id, title } = route.params;
-    const [elems, setElems] = useState<
-        JSX.Element | JSX.Element[] | string | null
-    >(null);
-
-    useEffect(() => {
-        parseArticle(storyURL).then((res) => {
-            setElems(res);
-        });
-    }, [storyURL]);
 
     return (
         <View className="container bg-zinc-100 p-1">
-            {elems === null ? (
-                <Text>Loading...</Text>
-            ) : (
-                <ScrollView className="p-1">
-                    <Text className="px-2 mt-2 mb-0.5 text-2xl font-extrabold">
-                        {title}
-                    </Text>
-                    {elems}
-                </ScrollView>
-            )}
+            <ScrollView className="p-1">
+                <Text className="px-2 mt-2 mb-0.5 text-2xl font-extrabold">
+                    {title}
+                </Text>
+                <React.Suspense
+                    fallback={<LoadingSpinner text="Loading article..." />}
+                >
+                    <ArticleBody storyURL={storyURL} />
+                </React.Suspense>
+            </ScrollView>
         </View>
     );
 }
