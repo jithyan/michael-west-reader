@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import {
     SafeAreaView,
     FlatList,
@@ -7,13 +7,14 @@ import {
     Image,
     Pressable,
 } from "react-native";
-import { selector, useRecoilValue } from "recoil";
+import { selector, useRecoilValue, useSetRecoilState } from "recoil";
 import { getLatestArticlesHTMLPageForCategory } from "./api";
 import { ArticleDescription, parseLatestArticlesHTMLPage } from "./parser";
 import { toSentenceCase } from "../core/util";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { LoadingSpinner } from "../core/components";
+import { paragraphsReadAtom } from "../Article/Article";
 
 const latestArticlesList = selector({
     key: "latestArticlesList",
@@ -74,6 +75,23 @@ function Story({
 
 function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
     const latestStories = useRecoilValue(latestArticlesList);
+    const setParagraphsRead = useSetRecoilState(paragraphsReadAtom);
+
+    useEffect(() => {
+        setParagraphsRead((prev) => {
+            const currentStoryIds = new Set(latestStories.map((s) => s.id));
+            const staleIdsToRemove = [];
+
+            prev.forEach((_, k) => {
+                if (!currentStoryIds.has(k)) {
+                    staleIdsToRemove.push(k);
+                }
+            });
+
+            console.debug("staleIdsToRemove", staleIdsToRemove);
+            return prev.deleteAll(staleIdsToRemove);
+        });
+    }, [latestStories]);
 
     return (
         <FlatList

@@ -29,11 +29,11 @@ const currentArticleAtom = atom<Partial<Readonly<ArticleDescription>>>({
 
 type ParagraphsReadCacheObject = Record<string, string[]>;
 
-const paragraphsReadAtom = atom({
+export const paragraphsReadAtom = atom({
     key: "paragraphsRead",
     default: Map<string, Set<string>>(),
     effects: [
-        ({ trigger, setSelf, onSet }) => {
+        ({ setSelf, onSet }) => {
             setSelf(
                 AsyncStorage.getItem("paragraphsRead")
                     .then((item) => {
