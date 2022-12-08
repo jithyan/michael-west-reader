@@ -47,7 +47,10 @@ function Story({
 }: ArticleDescription & { onTouch: () => void }) {
     return (
         <Pressable onPress={onTouch}>
-            <View className="flex-initial flex-row p-1" key={id}>
+            <View
+                className="flex-initial flex-row p-1 my-1 border-solid border-b-2 border-slate-500"
+                key={id}
+            >
                 <View className="basis-2/3">
                     <Text className="text-zinc-200 bg-orange-400 rounded-lg text-center">
                         {toSentenceCase(category)}
@@ -80,6 +83,7 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
 
     return (
         <FlatList
+            className=" mt-8 mb-8"
             data={latestStories}
             renderItem={({ item }) => (
                 <Story
@@ -105,7 +109,7 @@ type HomeProps = NativeStackScreenProps<
 
 export function LatestArticlesScreen({ route, navigation }: HomeProps) {
     return (
-        <SafeAreaView className="container bg-stone-800">
+        <SafeAreaView className="container bg-stone-800 px-4 py-2">
             <Suspense
                 fallback={<LoadingSpinner text="Fetching latest articles..." />}
             >
