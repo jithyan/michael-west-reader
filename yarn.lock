@@ -6136,7 +6136,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.13, lodash@npm:^4.17.4":
+"lodash@npm:^4.0.0, lodash@npm:^4.17.13, lodash@npm:^4.17.4":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -6672,6 +6672,7 @@ __metadata:
     prettier: ^2.8.0
     react: 18.1.0
     react-native: 0.70.5
+    react-native-intersection-observer: ^0.0.9
     react-native-loading-spinner-overlay: ^3.0.1
     react-native-safe-area-context: 4.4.1
     react-native-screens: ~3.18.0
@@ -7964,6 +7965,15 @@ __metadata:
   version: 0.70.3
   resolution: "react-native-gradle-plugin@npm:0.70.3"
   checksum: 04a3379842bcb4709ac6b37e093a3de59acd33b28b200885843b13908fac685a77ab81d732c34090c56e5c0eec971d578b227f302bd04fe7901e8792d434f41f
+  languageName: node
+  linkType: hard
+
+"react-native-intersection-observer@npm:^0.0.9":
+  version: 0.0.9
+  resolution: "react-native-intersection-observer@npm:0.0.9"
+  dependencies:
+    lodash: ^4.0.0
+  checksum: 345229547a8c876e4e8c3230d40b7d22b8f63d9241e3b8ed03581477873d6a40dd0361e5f2e7853a4b0c707f65381f51f1893cd3d684b0b15c1f3ea45c69ac94
   languageName: node
   linkType: hard
 

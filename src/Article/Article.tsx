@@ -2,14 +2,130 @@ import { View, Image, Text, ScrollView } from "react-native";
 import parse, { NodeType } from "node-html-parser";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
-import React from "react";
+import React, { useEffect, useId } from "react";
 import htmlToReactParser, {
     HTMLReactParserOptions,
     Element,
     domToReact,
 } from "html-react-parser";
-import { selectorFamily, useRecoilValue } from "recoil";
+import {
+    atom,
+    selector,
+    selectorFamily,
+    useRecoilValue,
+    useSetRecoilState,
+} from "recoil";
 import { LoadingSpinner } from "../core/components";
+import { ArticleDescription } from "../Home/parser";
+import { Map, Set } from "immutable";
+import { IOScrollView, InView } from "react-native-intersection-observer";
+
+const currentArticleAtom = atom<Partial<Readonly<ArticleDescription>>>({
+    key: "currentArticle",
+    default: null,
+});
+
+const paragraphsReadAtom = atom({
+    key: "paragraphsRead",
+    default: Map<string, Set<string>>(),
+});
+
+const paragraphsReadForCurrentArticleSelector = selector<number | string>({
+    key: "paragraphsReadForCurrentArticle",
+    get: ({ get }) => {
+        const currentArticle = get(currentArticleAtom);
+
+        if (!currentArticle?.id) {
+            return null;
+        }
+
+        return get(paragraphsReadAtom).get(currentArticle.id)?.size ?? 0;
+    },
+    set: ({ set, get }, id: string) => {
+        const currentArticle = get(currentArticleAtom);
+        if (!currentArticle?.id) {
+            return;
+        }
+        set(paragraphsReadAtom, (prev) =>
+            prev.set(
+                currentArticle.id,
+                prev.get(currentArticle.id, Set<string>()).add(id)
+            )
+        );
+    },
+});
+
+const totalNumParagraphsAtom = atom({
+    key: "totalNumParagraphs",
+    default: Map<string, number>(),
+});
+
+const totalParagraphsForCurrentArticleSelector = selector<number>({
+    key: "totalParagraphsForCurrentArticleSelector",
+    get: ({ get }) => {
+        const currentArticle = get(currentArticleAtom);
+
+        if (!currentArticle?.id) {
+            return -1;
+        }
+
+        return get(totalNumParagraphsAtom).get(currentArticle.id, -1);
+    },
+    set: ({ set, get }, totalNum: number) => {
+        const currentArticle = get(currentArticleAtom);
+        if (!currentArticle?.id) {
+            return;
+        }
+        set(totalNumParagraphsAtom, (prev) =>
+            prev.set(currentArticle.id, totalNum)
+        );
+    },
+});
+
+const currentArticleReadingProgressSelector = selector<number>({
+    key: "currentArticleReadingProgressAtom",
+    get: ({ get }) => {
+        const paragraphsRead = get(paragraphsReadForCurrentArticleSelector);
+        const totalParagraphsInCurrentArticle = get(
+            totalParagraphsForCurrentArticleSelector
+        );
+
+        if (
+            Number.isInteger(paragraphsRead) &&
+            Number.isInteger(totalParagraphsInCurrentArticle)
+        ) {
+            return paragraphsRead <= totalParagraphsInCurrentArticle - 1
+                ? Math.round(
+                      ((paragraphsRead as number) /
+                          totalParagraphsInCurrentArticle) *
+                          100
+                  )
+                : 100;
+        }
+
+        return 0;
+    },
+});
+
+const RegisterViewPortAwareness = ({ children }: { children: JSX.Element }) => {
+    const id = useId();
+    const setParagraphAsRead = useSetRecoilState(
+        paragraphsReadForCurrentArticleSelector
+    );
+
+    return (
+        <InView
+            triggerOnce={true}
+            onChange={(InView) => {
+                if (InView) {
+                    setParagraphAsRead(id);
+                }
+            }}
+        >
+            {children}
+        </InView>
+    );
+};
 
 const options: HTMLReactParserOptions = {
     replace: (domNode) => {
@@ -101,9 +217,11 @@ const options: HTMLReactParserOptions = {
 
                 case "p":
                     return (
-                        <Text className=" text-base font-normal mb-2 p-2">
-                            {parseChildren()}
-                        </Text>
+                        <RegisterViewPortAwareness>
+                            <Text className=" text-base font-normal mb-2 p-2">
+                                {parseChildren()}
+                            </Text>
+                        </RegisterViewPortAwareness>
                     );
 
                 default:
@@ -139,36 +257,80 @@ async function parseArticle(storyURL: string) {
         div.toString(),
         options
     ) as JSX.Element;
-    console.log("Array slice", React.Children.toArray(restOfBody).slice(0, 3));
-    return (
-        <>
-            <View>{coverImage}</View>
-            <View>{restOfBody}</View>
-        </>
-    );
+
+    return {
+        body: (
+            <>
+                <View>{coverImage}</View>
+                <View>{restOfBody}</View>
+            </>
+        ),
+        numParagraphs: div
+            .getElementsByTagName("p")
+            .map((e) => e.textContent?.trim())
+            .filter(Boolean).length,
+    };
 }
 
 function ArticleBody({ storyURL }: { storyURL: string }) {
-    return useRecoilValue(getParsedArticleFromURLSelector(storyURL));
+    const { body, numParagraphs } = useRecoilValue(
+        getParsedArticleFromURLSelector(storyURL)
+    );
+
+    const setTotalParagraphs = useSetRecoilState(
+        totalParagraphsForCurrentArticleSelector
+    );
+
+    useEffect(() => {
+        setTotalParagraphs(numParagraphs);
+    }, [numParagraphs]);
+
+    return body;
+}
+
+function PctRead({ id }: { id: string }) {
+    const numRead = useRecoilValue(paragraphsReadForCurrentArticleSelector);
+    const total = useRecoilValue(totalParagraphsForCurrentArticleSelector);
+    const pct = useRecoilValue(currentArticleReadingProgressSelector);
+
+    return (
+        <View>
+            <Text>
+                r:{numRead} t:{total} {pct}%
+            </Text>
+        </View>
+    );
 }
 
 type ArticleProps = NativeStackScreenProps<RootStackParamList, "Article">;
 
 export function Article({ route }: ArticleProps) {
     const { storyURL, id, title } = route.params;
+    const setCurrentArticle = useSetRecoilState(currentArticleAtom);
+
+    useEffect(() => {
+        setCurrentArticle({ id, storyURL, title });
+
+        return () => {
+            setCurrentArticle(null);
+        };
+    }, [id, storyURL, title, setCurrentArticle]);
 
     return (
         <View className="container bg-zinc-100 p-1">
-            <ScrollView className="p-1">
-                <Text className="px-2 mt-2 mb-0.5 text-2xl font-extrabold">
-                    {title}
-                </Text>
-                <React.Suspense
-                    fallback={<LoadingSpinner text="Loading article..." />}
-                >
-                    <ArticleBody storyURL={storyURL} />
-                </React.Suspense>
-            </ScrollView>
+            <PctRead id={id} />
+            <IOScrollView>
+                <ScrollView className="p-1">
+                    <Text className="px-2 mt-2 mb-0.5 text-2xl font-extrabold">
+                        {title}
+                    </Text>
+                    <React.Suspense
+                        fallback={<LoadingSpinner text="Loading article..." />}
+                    >
+                        <ArticleBody storyURL={storyURL} />
+                    </React.Suspense>
+                </ScrollView>
+            </IOScrollView>
         </View>
     );
 }
