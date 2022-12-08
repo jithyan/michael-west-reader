@@ -17,7 +17,7 @@ import { toSentenceCase } from "../core/util";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { LoadingSpinner } from "../core/components";
-import { paragraphsReadAtom } from "../Article/ArticleScreen";
+import { paragraphsReadAtom } from "../ArticleScreen/article-state";
 
 const latestArticlesList = selector({
     key: "latestArticlesList",

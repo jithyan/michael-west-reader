@@ -2,11 +2,12 @@ import { registerRootComponent } from "expo";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { LatestArticlesScreen } from "./LatestArticlesScreen/LatestArticlesScreen";
-import { ArticleScreen, paragraphsReadAtom } from "./Article/ArticleScreen";
+import { ArticleScreen } from "./ArticleScreen/ArticleScreen";
 import { ArticleDescription } from "./LatestArticlesScreen/articles-list-page-parser";
 import { RecoilRoot, useRecoilValue } from "recoil";
 import { LoadingSpinner } from "./core/components";
 import { Suspense } from "react";
+import { paragraphsReadAtom } from "./ArticleScreen/article-state";
 
 const Stack = createNativeStackNavigator();
 
