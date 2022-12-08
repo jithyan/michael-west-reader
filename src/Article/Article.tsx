@@ -10,6 +10,7 @@ import htmlToReactParser, {
 } from "html-react-parser";
 import {
     atom,
+    DefaultValue,
     selector,
     selectorFamily,
     useRecoilValue,
@@ -19,15 +20,62 @@ import { LoadingSpinner } from "../core/components";
 import { ArticleDescription } from "../Home/parser";
 import { Map, Set } from "immutable";
 import { IOScrollView, InView } from "react-native-intersection-observer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const currentArticleAtom = atom<Partial<Readonly<ArticleDescription>>>({
     key: "currentArticle",
     default: null,
 });
 
+type ParagraphsReadCacheObject = Record<string, string[]>;
+
 const paragraphsReadAtom = atom({
     key: "paragraphsRead",
     default: Map<string, Set<string>>(),
+    effects: [
+        ({ trigger, setSelf, onSet }) => {
+            setSelf(
+                AsyncStorage.getItem("paragraphsRead")
+                    .then((item) => {
+                        if (typeof item === "string") {
+                            const storageItem = JSON.parse(
+                                item
+                            ) as ParagraphsReadCacheObject;
+                            return Map(
+                                Object.keys(storageItem).map((key) => [
+                                    key,
+                                    Set(storageItem[key]),
+                                ])
+                            );
+                        }
+                        return new DefaultValue();
+                    })
+                    .catch((e) => {
+                        console.error(
+                            "Error grabbing storage for paragraphsRead",
+                            e
+                        );
+                        return new DefaultValue();
+                    })
+            );
+
+            onSet((newValue, _, isReset) => {
+                isReset
+                    ? AsyncStorage.removeItem("paragraphsRead")
+                    : AsyncStorage.setItem(
+                          "paragraphsRead",
+                          JSON.stringify(
+                              newValue
+                                  .toArray()
+                                  .reduce((prev, [key, value]) => {
+                                      prev[key] = value.toJS() as string[];
+                                      return prev;
+                                  }, {} as ParagraphsReadCacheObject)
+                          )
+                      );
+            });
+        },
+    ],
 });
 
 const paragraphsReadForCurrentArticleSelector = selector<number | string>({
