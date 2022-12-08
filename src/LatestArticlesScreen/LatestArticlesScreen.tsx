@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense } from "react";
 import {
     SafeAreaView,
     FlatList,
@@ -17,9 +17,8 @@ import { toSentenceCase } from "../core/util";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { LoadingSpinner } from "../core/components";
-import { paragraphsReadAtom } from "../ArticleScreen/article-state";
 
-const latestArticlesList = selector({
+export const latestArticlesList = selector({
     key: "latestArticlesList",
     get: async () => {
         const articles = await Promise.all([
@@ -78,23 +77,6 @@ function Story({
 
 function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
     const latestStories = useRecoilValue(latestArticlesList);
-    const setParagraphsRead = useSetRecoilState(paragraphsReadAtom);
-
-    useEffect(() => {
-        setParagraphsRead((prev) => {
-            const currentStoryIds = new Set(latestStories.map((s) => s.id));
-            const staleIdsToRemove = [];
-
-            prev.forEach((_, k) => {
-                if (!currentStoryIds.has(k)) {
-                    staleIdsToRemove.push(k);
-                }
-            });
-
-            console.debug("staleIdsToRemove", staleIdsToRemove);
-            return prev.deleteAll(staleIdsToRemove);
-        });
-    }, [latestStories]);
 
     return (
         <FlatList
