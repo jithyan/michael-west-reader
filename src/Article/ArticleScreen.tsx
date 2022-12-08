@@ -17,7 +17,7 @@ import {
     useSetRecoilState,
 } from "recoil";
 import { LoadingSpinner } from "../core/components";
-import { ArticleDescription } from "../Home/parser";
+import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
 import { Map, Set } from "immutable";
 import { IOScrollView, InView } from "react-native-intersection-observer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -350,9 +350,9 @@ function PctRead({ id }: { id: string }) {
     );
 }
 
-type ArticleProps = NativeStackScreenProps<RootStackParamList, "Article">;
+type ArticleProps = NativeStackScreenProps<RootStackParamList, "ArticleScreen">;
 
-export function Article({ route }: ArticleProps) {
+export function ArticleScreen({ route }: ArticleProps) {
     const { storyURL, id, title } = route.params;
     const setCurrentArticle = useSetRecoilState(currentArticleAtom);
 

@@ -1,9 +1,9 @@
 import { registerRootComponent } from "expo";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Home } from "./Home/Home";
-import { Article, paragraphsReadAtom } from "./Article/Article";
-import { ArticleDescription } from "./Home/parser";
+import { LatestArticlesScreen } from "./LatestArticlesScreen/LatestArticlesScreen";
+import { ArticleScreen, paragraphsReadAtom } from "./Article/ArticleScreen";
+import { ArticleDescription } from "./LatestArticlesScreen/articles-list-page-parser";
 import { RecoilRoot, useRecoilValue } from "recoil";
 import { LoadingSpinner } from "./core/components";
 import { Suspense } from "react";
@@ -11,8 +11,8 @@ import { Suspense } from "react";
 const Stack = createNativeStackNavigator();
 
 export type RootStackParamList = {
-    Home: undefined;
-    Article: Pick<ArticleDescription, "id" | "storyURL" | "title">;
+    LatestArticlesList: undefined;
+    ArticleScreen: Pick<ArticleDescription, "id" | "storyURL" | "title">;
 };
 
 function LoadAppPersistence({ children }: { children: JSX.Element }) {
@@ -28,15 +28,15 @@ export default function App() {
                     <NavigationContainer>
                         <Stack.Navigator>
                             <Stack.Screen
-                                name="Home"
-                                component={Home}
+                                name="LatestArticlesList"
+                                component={LatestArticlesScreen}
                                 options={{
                                     header: () => <></>,
                                 }}
                             />
                             <Stack.Screen
-                                name="Article"
-                                component={Article}
+                                name="ArticleScreen"
+                                component={ArticleScreen}
                                 options={{
                                     headerTitle: "",
                                 }}

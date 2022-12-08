@@ -8,13 +8,16 @@ import {
     Pressable,
 } from "react-native";
 import { selector, useRecoilValue, useSetRecoilState } from "recoil";
-import { getLatestArticlesHTMLPageForCategory } from "./api";
-import { ArticleDescription, parseLatestArticlesHTMLPage } from "./parser";
+import { getLatestArticlesHTMLPageForCategory } from "./articles-list-page-api";
+import {
+    ArticleDescription,
+    parseLatestArticlesHTMLPage,
+} from "./articles-list-page-parser";
 import { toSentenceCase } from "../core/util";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { LoadingSpinner } from "../core/components";
-import { paragraphsReadAtom } from "../Article/Article";
+import { paragraphsReadAtom } from "../Article/ArticleScreen";
 
 const latestArticlesList = selector({
     key: "latestArticlesList",
@@ -100,7 +103,7 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
                 <Story
                     {...item}
                     onTouch={() => {
-                        navigation.navigate("Article", {
+                        navigation.navigate("ArticleScreen", {
                             id: item.id,
                             storyURL: item.storyURL,
                             title: item.title,
@@ -113,9 +116,12 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
     );
 }
 
-type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
+type HomeProps = NativeStackScreenProps<
+    RootStackParamList,
+    "LatestArticlesList"
+>;
 
-export function Home({ route, navigation }: HomeProps) {
+export function LatestArticlesScreen({ route, navigation }: HomeProps) {
     return (
         <SafeAreaView className="container bg-stone-800">
             <Suspense

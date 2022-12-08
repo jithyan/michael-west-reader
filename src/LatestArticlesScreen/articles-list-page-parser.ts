@@ -1,6 +1,6 @@
 import { parse, HTMLElement } from "node-html-parser";
 import { ParsingError } from "../core/errors";
-import { Category } from "./api";
+import { Category } from "./articles-list-page-api";
 
 class Article implements ArticleDescription {
     readonly title: string;
