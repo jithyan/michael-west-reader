@@ -36,43 +36,91 @@ export const latestArticlesList = selector({
     },
 });
 
-function Story({
+function NewsItem({
     id,
     title,
     imageURL,
     author,
     published,
-    category,
-    onTouch,
-}: ArticleDescription & { onTouch: () => void }) {
+}: Omit<ArticleDescription, "category">) {
     return (
-        <Pressable onPress={onTouch}>
-            <View
-                className="flex-initial flex-row p-1 my-1 border-solid border-b-2 border-slate-500"
-                key={id}
-            >
-                <View className="basis-2/3">
-                    <Text className="text-zinc-200 bg-orange-400 rounded-lg text-center">
-                        {toSentenceCase(category)}
+        <>
+            <View className="basis-2/3">
+                <Text className="text-zinc-300 font-extrabold text-xl p-0.5">
+                    {title}
+                </Text>
+                <View className="flex-initial flex-row">
+                    <Text className="text-zinc-300 font-light text-xs mr-1">
+                        {author}
                     </Text>
-                    <Text className="text-zinc-300 font-extrabold text-xl p-0.5">
-                        {title}
+                    <Text className="text-zinc-300 font-light text-xs">
+                        {published}
                     </Text>
-                    <View className="flex-initial flex-row">
-                        <Text className="text-zinc-300 font-light text-xs mr-1">
-                            {author}
-                        </Text>
-                        <Text className="text-zinc-300 font-light text-xs">
-                            {published}
-                        </Text>
-                    </View>
                 </View>
-                <View className="basis-1/3 p-1">
+            </View>
+            <View className="basis-1/3">
+                <Text className="text-zinc-200 bg-orange-400 text-center text-xs">
+                    News
+                </Text>
+                <Image
+                    className="aspect-square rounded-md"
+                    source={{ uri: imageURL }}
+                />
+            </View>
+        </>
+    );
+}
+
+function StoryItem({
+    id,
+    title,
+    imageURL,
+    author,
+    published,
+}: Omit<ArticleDescription, "category">) {
+    return (
+        <View className="flex-initial flex-col">
+            <View className="bg-yellow-500 rounded-md px-0.5 pt-0.5">
+                <Text className=" text-zinc-800 font-extrabold text-md px-2">
+                    Story
+                </Text>
+                <View className=" basis-full my-0.5">
                     <Image
-                        className="aspect-square rounded-md"
+                        className="aspect-video rounded-md"
                         source={{ uri: imageURL }}
                     />
                 </View>
+            </View>
+            <View className="basis-full  rounded-md  my-0.5">
+                <Text className=" text-zinc-300 font-extrabold text-xl p-0.5">
+                    {title}
+                </Text>
+            </View>
+            <View className="flex-initial flex-row">
+                <Text className="text-zinc-300 font-light text-xs mr-1">
+                    {author}
+                </Text>
+                <Text className="text-zinc-300 font-light text-xs">
+                    {published}
+                </Text>
+            </View>
+        </View>
+    );
+}
+
+function Article({
+    category,
+    onTouch,
+    ...rest
+}: ArticleDescription & { onTouch: () => void }) {
+    return (
+        <Pressable onPress={onTouch}>
+            <View className="flex-initial flex-row px-1 py-2 my-1 border-solid border-b-2 border-slate-500">
+                {category === "news" ? (
+                    <NewsItem {...rest} />
+                ) : (
+                    <StoryItem {...rest} />
+                )}
             </View>
         </Pressable>
     );
@@ -83,10 +131,10 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
 
     return (
         <FlatList
-            className=" mt-8 mb-8"
+            className="my-8"
             data={latestStories}
             renderItem={({ item }) => (
-                <Story
+                <Article
                     {...item}
                     onTouch={() => {
                         navigation.navigate("ArticleScreen", {
@@ -109,7 +157,7 @@ type HomeProps = NativeStackScreenProps<
 
 export function LatestArticlesScreen({ route, navigation }: HomeProps) {
     return (
-        <SafeAreaView className="container bg-stone-800 px-4 py-2">
+        <SafeAreaView className="container bg-blue-900 px-4 py-2">
             <Suspense
                 fallback={<LoadingSpinner text="Fetching latest articles..." />}
             >
