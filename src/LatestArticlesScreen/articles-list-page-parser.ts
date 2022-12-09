@@ -1,6 +1,18 @@
 import { parse, HTMLElement } from "node-html-parser";
 import { ParsingError } from "../core/errors";
 import { Category } from "./articles-list-page-api";
+import { parse as dateParse, set } from "date-fns";
+
+function parseDateWithoutTime(dateString: string): Date {
+    return set(dateParse(dateString, "MMMM d, yyyy", new Date()), {
+        hours: 23,
+        minutes: 59,
+    });
+}
+
+function parseDateWithTime(dateString: string): Date {
+    return dateParse(dateString, "MMMM d, yyyy HH:mm", new Date());
+}
 
 class Article implements ArticleDescription {
     readonly title: string;
@@ -11,6 +23,7 @@ class Article implements ArticleDescription {
     readonly author: string;
     readonly storyURL: string;
     readonly category: Category;
+    readonly date: Date;
 
     constructor(article: HTMLElement, category: Category) {
         const { storyURL, title } = extractTitleAndURLFromArticle(article);
@@ -23,6 +36,10 @@ class Article implements ArticleDescription {
         this.published = extractPublishedDateFromArticle(article);
         this.author = extractAuthorFromArticle(article);
         this.category = category;
+        this.date =
+            category === "news"
+                ? parseDateWithTime(this.published)
+                : parseDateWithoutTime(this.published);
     }
 }
 
@@ -35,6 +52,7 @@ export interface ArticleDescription {
     author: string;
     storyURL: string;
     category: Category;
+    date: Date;
 }
 
 function parseArticle(
@@ -72,7 +90,7 @@ function extractIdFromArticle(article: HTMLElement): string {
 
 function extractImageURLFromArticle(article: HTMLElement): string {
     const imgTag = article.querySelector("img");
-    return imgTag.attributes.src?.trim() ?? "";
+    return imgTag?.attributes.src?.trim() ?? "";
 }
 
 function extractSummaryFromArticle(article: HTMLElement): string {
@@ -106,6 +124,7 @@ export function parseLatestArticlesHTMLPage(
         }
         return uniqueArticles;
     } catch (e) {
+        console.log(e);
         throw new ParsingError(`Error parsing page for category ${category}`, {
             cause: e,
         });
