@@ -57,6 +57,8 @@ export const latestArticlesList = selector({
             fetchAndParseArticles("news", 3),
             fetchAndParseArticles("news", 4),
             fetchAndParseArticles("news", 5),
+            fetchAndParseArticles("news", 6),
+            fetchAndParseArticles("news", 7),
             fetchAndParseArticles("story", 1),
             fetchAndParseArticles("story", 2),
         ]);
@@ -92,11 +94,11 @@ function NewsItem({
                 <ReadProgress id={id} />
             </View>
             <View className="basis-1/3">
-                <Text className="text-zinc-200 bg-orange-400 text-center text-xs">
+                <Text className="text-zinc-800 bg-amber-500 text-center text-xs rounded-t-md">
                     News
                 </Text>
                 <Image
-                    className="aspect-square rounded-md"
+                    className="aspect-square rounded-b-md"
                     source={{ uri: imageURL }}
                 />
             </View>
@@ -113,7 +115,7 @@ function StoryItem({
 }: Omit<ArticleDescription, "category">) {
     return (
         <View className="flex-initial flex-col">
-            <View className="bg-yellow-500 rounded-md px-0.5 pt-0.5">
+            <View className=" bg-amber-500 rounded-md px-0.5 pt-0.5">
                 <Text className=" text-zinc-800 font-extrabold text-md px-2">
                     Story
                 </Text>
@@ -124,7 +126,7 @@ function StoryItem({
                     />
                 </View>
             </View>
-            <View className="basis-full  rounded-md  my-0.5">
+            <View className="basis-full rounded-md  my-0.5">
                 <Text className=" text-zinc-300 font-extrabold text-xl p-0.5">
                     {title}
                 </Text>
@@ -136,8 +138,8 @@ function StoryItem({
                 <Text className="text-zinc-300 font-light text-xs">
                     {published}
                 </Text>
-                <ReadProgress id={id} />
             </View>
+            <ReadProgress id={id} />
         </View>
     );
 }
@@ -162,7 +164,7 @@ function Article({
 
 function DateItem({ date }: { date: string }) {
     return (
-        <View className=" bg-yellow-500 flex-initial flex-row px-1 py-2 my-1 border-solid border-b-2 border-slate-500">
+        <View className=" bg-yellow-500 flex-initial flex-row px-1 py-2 my-1 border-solid border-b-2 border-sky-800 rounded-lg">
             <Text className="text-zinc-800 font-extrabold text-md mr-1">
                 {date}
             </Text>
@@ -206,7 +208,7 @@ type HomeProps = NativeStackScreenProps<
 
 export function LatestArticlesScreen({ route, navigation }: HomeProps) {
     return (
-        <SafeAreaView className="container bg-blue-900 px-4 py-2">
+        <SafeAreaView className="container bg-sky-900 px-4 py-2">
             <Suspense
                 fallback={<LoadingSpinner text="Fetching latest articles..." />}
             >
