@@ -1,4 +1,4 @@
-import { View, Image, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import React, { useEffect } from "react";
@@ -10,16 +10,16 @@ import {
     totalParagraphsForCurrentArticleSelector,
     paragraphsReadForCurrentArticleSelector,
     currentArticleReadingProgressSelector,
-    currentArticleAtom,
 } from "./article-state";
+import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
 
-function ArticleBody({ storyURL }: { storyURL: string }) {
+function ArticleBody(props: Pick<ArticleDescription, "id" | "storyURL">) {
     const { body, numParagraphs } = useRecoilValue(
-        getParsedArticleFromURLSelector(storyURL)
+        getParsedArticleFromURLSelector(props)
     );
 
     const setTotalParagraphs = useSetRecoilState(
-        totalParagraphsForCurrentArticleSelector
+        totalParagraphsForCurrentArticleSelector(props.id)
     );
 
     useEffect(() => {
@@ -30,9 +30,9 @@ function ArticleBody({ storyURL }: { storyURL: string }) {
 }
 
 function PctRead({ id }: { id: string }) {
-    const numRead = useRecoilValue(paragraphsReadForCurrentArticleSelector);
-    const total = useRecoilValue(totalParagraphsForCurrentArticleSelector);
-    const pct = useRecoilValue(currentArticleReadingProgressSelector);
+    const numRead = useRecoilValue(paragraphsReadForCurrentArticleSelector(id));
+    const total = useRecoilValue(totalParagraphsForCurrentArticleSelector(id));
+    const pct = useRecoilValue(currentArticleReadingProgressSelector(id));
 
     return (
         <View>
@@ -47,15 +47,6 @@ type ArticleProps = NativeStackScreenProps<RootStackParamList, "ArticleScreen">;
 
 export function ArticleScreen({ route }: ArticleProps) {
     const { storyURL, id, title } = route.params;
-    const setCurrentArticle = useSetRecoilState(currentArticleAtom);
-
-    useEffect(() => {
-        setCurrentArticle({ id, storyURL, title });
-
-        return () => {
-            setCurrentArticle(null);
-        };
-    }, [id, storyURL, title, setCurrentArticle]);
 
     return (
         <View className="container bg-zinc-100 p-1">
@@ -68,7 +59,7 @@ export function ArticleScreen({ route }: ArticleProps) {
                     <React.Suspense
                         fallback={<LoadingSpinner text="Loading article..." />}
                     >
-                        <ArticleBody storyURL={storyURL} />
+                        <ArticleBody storyURL={storyURL} id={id} />
                     </React.Suspense>
                 </ScrollView>
             </IOScrollView>

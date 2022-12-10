@@ -7,7 +7,7 @@ import {
     Image,
     Pressable,
 } from "react-native";
-import { selector, useRecoilValue, useSetRecoilState } from "recoil";
+import { selector, useRecoilValue } from "recoil";
 import {
     Category,
     getLatestArticlesHTMLPageForCategory,
@@ -89,6 +89,7 @@ function NewsItem({
                     <Text className="text-zinc-300 font-light text-xs">
                         {published}
                     </Text>
+                    <ReadProgress id={id} />
                 </View>
             </View>
             <View className="basis-1/3">
@@ -136,13 +137,14 @@ function StoryItem({
                 <Text className="text-zinc-300 font-light text-xs">
                     {published}
                 </Text>
+                <ReadProgress id={id} />
             </View>
         </View>
     );
 }
 
-export function ReadProgress() {
-    const pct = useRecoilValue(currentArticleReadingProgressSelector);
+export function ReadProgress({ id }: Pick<ArticleDescription, "id">) {
+    const pct = useRecoilValue(currentArticleReadingProgressSelector(id));
 
     if (pct === 100) {
         return (
@@ -150,18 +152,20 @@ export function ReadProgress() {
                 <View>
                     <FilledTick />
                 </View>
-                <Text>Read</Text>
+                <Text className="text-zinc-300 font-light text">Read</Text>
             </View>
         );
     }
 
     if (pct === 0) {
-        <View>
+        return (
             <View>
-                <Eye />
+                <View>
+                    <Eye />
+                </View>
+                <Text className="text-zinc-300 font-light text">Unread</Text>
             </View>
-            <Text>Unread</Text>
-        </View>;
+        );
     }
 
     return (
@@ -169,7 +173,7 @@ export function ReadProgress() {
             <View>
                 <UnfilledTick />
             </View>
-            <Text>read</Text>;
+            <Text className="text-zinc-300 font-light text">{pct}% read</Text>
         </View>
     );
 }

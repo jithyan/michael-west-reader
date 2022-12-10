@@ -4,11 +4,6 @@ import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-p
 import { parseArticle } from "./article-page-parser";
 import { Map, Set } from "immutable";
 
-export const currentArticleAtom = atom<Partial<Readonly<ArticleDescription>>>({
-    key: "currentArticle",
-    default: null,
-});
-
 type ParagraphsReadCacheObject = Record<string, string[]>;
 
 export const paragraphsReadAtom = atom({
@@ -60,88 +55,132 @@ export const paragraphsReadAtom = atom({
     ],
 });
 
-export const paragraphsReadForCurrentArticleSelector = selector<
-    number | string
+export const paragraphsReadForCurrentArticleSelector = selectorFamily<
+    number | string,
+    string
 >({
     key: "paragraphsReadForCurrentArticle",
-    get: ({ get }) => {
-        const currentArticle = get(currentArticleAtom);
-
-        if (!currentArticle?.id) {
-            return null;
-        }
-
-        return get(paragraphsReadAtom).get(currentArticle.id)?.size ?? 0;
-    },
-    set: ({ set, get }, id: string) => {
-        const currentArticle = get(currentArticleAtom);
-        if (!currentArticle?.id) {
-            return;
-        }
-        set(paragraphsReadAtom, (prev) =>
-            prev.set(
-                currentArticle.id,
-                prev.get(currentArticle.id, Set<string>()).add(id)
-            )
-        );
-    },
+    get:
+        (id) =>
+        ({ get }) => {
+            return get(paragraphsReadAtom).get(id)?.size ?? 0;
+        },
+    set:
+        (storyId) =>
+        ({ set }, paragraphId: string) => {
+            set(paragraphsReadAtom, (prev) =>
+                prev.set(
+                    storyId,
+                    prev.get(storyId, Set<string>()).add(paragraphId)
+                )
+            );
+        },
 });
+
+type TotalParagraphsCacheObject = Record<string, number>;
 
 export const totalNumParagraphsAtom = atom({
     key: "totalNumParagraphs",
     default: Map<string, number>(),
+    effects: [
+        ({ setSelf, onSet }) => {
+            setSelf(
+                AsyncStorage.getItem("totalNumParagraphs")
+                    .then((item) => {
+                        if (typeof item === "string") {
+                            const storageItem = JSON.parse(
+                                item
+                            ) as TotalParagraphsCacheObject;
+                            return Map(
+                                Object.keys(storageItem).map((key) => [
+                                    key,
+                                    storageItem[key],
+                                ])
+                            );
+                        }
+                        return new DefaultValue();
+                    })
+                    .catch((e) => {
+                        console.error(
+                            "Error grabbing storage for paragraphsRead",
+                            e
+                        );
+                        return new DefaultValue();
+                    })
+            );
+
+            onSet((newValue, _, isReset) => {
+                isReset
+                    ? AsyncStorage.removeItem("totalNumParagraphs")
+                    : AsyncStorage.setItem(
+                          "totalNumParagraphs",
+                          JSON.stringify(
+                              newValue.toJSON() as TotalParagraphsCacheObject
+                          )
+                      );
+            });
+        },
+    ],
 });
 
-export const totalParagraphsForCurrentArticleSelector = selector<number>({
+export const totalParagraphsForCurrentArticleSelector = selectorFamily<
+    number,
+    string
+>({
     key: "totalParagraphsForCurrentArticleSelector",
-    get: ({ get }) => {
-        const currentArticle = get(currentArticleAtom);
-
-        if (!currentArticle?.id) {
-            return -1;
-        }
-
-        return get(totalNumParagraphsAtom).get(currentArticle.id, -1);
-    },
-    set: ({ set, get }, totalNum: number) => {
-        const currentArticle = get(currentArticleAtom);
-        if (!currentArticle?.id) {
-            return;
-        }
-        set(totalNumParagraphsAtom, (prev) =>
-            prev.set(currentArticle.id, totalNum)
-        );
-    },
+    get:
+        (storyId) =>
+        ({ get }) => {
+            return get(totalNumParagraphsAtom).get(storyId, -1);
+        },
+    set:
+        (storyId) =>
+        ({ set, get }, totalNum: number) => {
+            set(totalNumParagraphsAtom, (prev) => prev.set(storyId, totalNum));
+        },
 });
 
-export const currentArticleReadingProgressSelector = selector<number>({
+export const currentArticleReadingProgressSelector = selectorFamily<
+    number,
+    string
+>({
     key: "currentArticleReadingProgressAtom",
-    get: ({ get }) => {
-        const paragraphsRead = get(paragraphsReadForCurrentArticleSelector);
-        const totalParagraphsInCurrentArticle = get(
-            totalParagraphsForCurrentArticleSelector
-        );
+    get:
+        (storyId) =>
+        ({ get }) => {
+            const paragraphsRead = get(
+                paragraphsReadForCurrentArticleSelector(storyId)
+            );
+            const totalParagraphsInCurrentArticle = get(
+                totalParagraphsForCurrentArticleSelector(storyId)
+            );
 
-        if (
-            Number.isInteger(paragraphsRead) &&
-            Number.isInteger(totalParagraphsInCurrentArticle)
-        ) {
-            return paragraphsRead <= totalParagraphsInCurrentArticle - 1
-                ? Math.round(
-                      ((paragraphsRead as number) /
-                          totalParagraphsInCurrentArticle) *
-                          100
-                  )
-                : 100;
-        }
+            console.log({ paragraphsRead, totalParagraphsInCurrentArticle });
 
-        return 0;
-    },
+            if (totalParagraphsInCurrentArticle < 1) {
+                return 0;
+            }
+
+            if (
+                Number.isInteger(paragraphsRead) &&
+                Number.isInteger(totalParagraphsInCurrentArticle)
+            ) {
+                return paragraphsRead <= totalParagraphsInCurrentArticle - 1
+                    ? Math.round(
+                          ((paragraphsRead as number) /
+                              totalParagraphsInCurrentArticle) *
+                              100
+                      )
+                    : 100;
+            }
+
+            return 0;
+        },
 });
 
 export const getParsedArticleFromURLSelector = selectorFamily({
     key: "parsedArticle",
-    get: (storyURL: string) => async () => {
-        return parseArticle(storyURL);
+    get: (args: Pick<ArticleDescription, "id" | "storyURL">) => async () => {
+        return parseArticle(args);
     },
 });

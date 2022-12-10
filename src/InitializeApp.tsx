@@ -20,8 +20,8 @@ export function InitializeApp({ children }: { children: JSX.Element }) {
 }
 
 function LoadAtomsSyncedToStorage({ children }: { children: JSX.Element }) {
-    useRecoilValue(paragraphsReadAtom);
-    return children;
+    const v = useRecoilValue(paragraphsReadAtom);
+    return v ? children : null;
 }
 
 function PruneItemsFromStorage() {
