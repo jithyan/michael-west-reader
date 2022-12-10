@@ -2484,6 +2484,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/xxhashjs@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "@types/xxhashjs@npm:0.2.2"
+  dependencies:
+    "@types/node": "*"
+  checksum: 2195cd97c32dfb0ab37fd831368ad106c43c4d2450dda441b493875ad476b00ccee5e3a676971cf8a6f7518c23d527a6791b8b005f7e52c9d3b39bc7286f1615
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.0
   resolution: "@types/yargs-parser@npm:21.0.0"
@@ -6722,6 +6731,7 @@ __metadata:
     "@react-navigation/native-stack": ^6.9.4
     "@types/react": ~18.0.24
     "@types/react-native": ~0.70.6
+    "@types/xxhashjs": ^0.2.2
     date-fns: ^2.29.3
     expo: ~47.0.8
     expo-status-bar: ~1.4.2

@@ -10,8 +10,10 @@ import htmlToReactParser, {
 } from "html-react-parser";
 import { paragraphsReadForCurrentArticleSelector } from "./article-state";
 import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
+import { h64 } from "xxhashjs";
 
 const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
+    const paragraph = { count: 0 };
     const options: HTMLReactParserOptions = {
         replace: (domNode) => {
             if (
@@ -101,8 +103,18 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                         );
 
                     case "p":
+                        const textNodes = domNode.childNodes
+                            .filter((n) => n.nodeType === NodeType.TEXT_NODE)
+                            .map((n) => (n as any).data as string);
+                        paragraph.count++;
+
+                        const hash = textNodes
+                            .reduce((prev, curr) => prev.update(curr), h64(256))
+                            .digest()
+                            .toString();
+
                         return (
-                            <RegisterViewPortAwareness storyId={id}>
+                            <RegisterViewPortAwareness storyId={id} hash={hash}>
                                 <Text className=" text-base font-normal mb-2 p-2">
                                     {parseChildren()}
                                 </Text>
@@ -118,17 +130,18 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
         },
     };
 
-    return options;
+    return { options, paragraph };
 };
 
 const RegisterViewPortAwareness = ({
     children,
     storyId,
+    hash,
 }: {
     children: JSX.Element;
     storyId: string;
+    hash: string;
 }) => {
-    const id = useId();
     const setParagraphAsRead = useSetRecoilState(
         paragraphsReadForCurrentArticleSelector(storyId)
     );
@@ -138,7 +151,7 @@ const RegisterViewPortAwareness = ({
             triggerOnce={true}
             onChange={(InView) => {
                 if (InView) {
-                    setParagraphAsRead(id);
+                    setParagraphAsRead(hash);
                 }
             }}
         >
@@ -160,12 +173,13 @@ export async function parseArticle({
             .querySelector(".featured-image")
             .getElementsByTagName("img")
             .toString(),
-        getOptions({ id })
+        getOptions({ id }).options
     ) as JSX.Element;
 
+    const { options, paragraph } = getOptions({ id });
     const restOfBody = htmlToReactParser(
         div.toString(),
-        getOptions({ id })
+        options
     ) as JSX.Element;
 
     return {
@@ -175,9 +189,6 @@ export async function parseArticle({
                 <View>{restOfBody}</View>
             </>
         ),
-        numParagraphs: div
-            .getElementsByTagName("p")
-            .map((e) => e.textContent?.trim())
-            .filter(Boolean).length,
+        numParagraphs: paragraph.count,
     };
 }

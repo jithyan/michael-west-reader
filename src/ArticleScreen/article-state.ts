@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { atom, DefaultValue, selector, selectorFamily } from "recoil";
+import { atom, DefaultValue, selectorFamily } from "recoil";
 import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
 import { parseArticle } from "./article-page-parser";
 import { Map, Set } from "immutable";
@@ -155,8 +155,6 @@ export const currentArticleReadingProgressSelector = selectorFamily<
                 totalParagraphsForCurrentArticleSelector(storyId)
             );
 
-            console.log({ paragraphsRead, totalParagraphsInCurrentArticle });
-
             if (totalParagraphsInCurrentArticle < 1) {
                 return 0;
             }
@@ -165,13 +163,11 @@ export const currentArticleReadingProgressSelector = selectorFamily<
                 Number.isInteger(paragraphsRead) &&
                 Number.isInteger(totalParagraphsInCurrentArticle)
             ) {
-                return paragraphsRead <= totalParagraphsInCurrentArticle - 1
-                    ? Math.round(
-                          ((paragraphsRead as number) /
-                              totalParagraphsInCurrentArticle) *
-                              100
-                      )
-                    : 100;
+                return Math.round(
+                    ((paragraphsRead as number) /
+                        totalParagraphsInCurrentArticle) *
+                        100
+                );
             }
 
             return 0;
