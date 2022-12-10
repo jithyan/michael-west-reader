@@ -173,10 +173,3 @@ export const currentArticleReadingProgressSelector = selectorFamily<
             return 0;
         },
 });
-
-export const getParsedArticleFromURLSelector = selectorFamily({
-    key: "parsedArticle",
-    get: (args: Pick<ArticleDescription, "id" | "storyURL">) => async () => {
-        return parseArticle(args);
-    },
-});

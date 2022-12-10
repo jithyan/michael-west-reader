@@ -2,16 +2,23 @@ import { View, Text, ScrollView } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import React, { useEffect } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { selectorFamily, useRecoilValue, useSetRecoilState } from "recoil";
 import { LoadingSpinner } from "../core/components";
 import { IOScrollView } from "react-native-intersection-observer";
 import {
-    getParsedArticleFromURLSelector,
     totalParagraphsForCurrentArticleSelector,
     paragraphsReadForCurrentArticleSelector,
     currentArticleReadingProgressSelector,
 } from "./article-state";
 import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
+import { parseArticle } from "./article-page-parser";
+
+export const getParsedArticleFromURLSelector = selectorFamily({
+    key: "parsedArticle",
+    get: (args: Pick<ArticleDescription, "id" | "storyURL">) => async () => {
+        return parseArticle(args);
+    },
+});
 
 function ArticleBody(props: Pick<ArticleDescription, "id" | "storyURL">) {
     const { body, numParagraphs } = useRecoilValue(

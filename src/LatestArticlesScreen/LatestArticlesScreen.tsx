@@ -22,8 +22,7 @@ import { RootStackParamList } from "../App";
 import { LoadingSpinner } from "../core/components";
 import { compareDesc } from "date-fns/esm";
 import { format, getDayOfYear } from "date-fns";
-import { currentArticleReadingProgressSelector } from "../ArticleScreen/article-state";
-import { FilledTick, Eye, UnfilledTick } from "../core/icons";
+import { ReadProgress } from "./ReadProgress";
 
 const fetchAndParseArticles = (category: Category, pageNumber: number) =>
     getLatestArticlesHTMLPageForCategory(category, pageNumber).then(
@@ -89,8 +88,8 @@ function NewsItem({
                     <Text className="text-zinc-300 font-light text-xs">
                         {published}
                     </Text>
-                    <ReadProgress id={id} />
                 </View>
+                <ReadProgress id={id} />
             </View>
             <View className="basis-1/3">
                 <Text className="text-zinc-200 bg-orange-400 text-center text-xs">
@@ -139,41 +138,6 @@ function StoryItem({
                 </Text>
                 <ReadProgress id={id} />
             </View>
-        </View>
-    );
-}
-
-export function ReadProgress({ id }: Pick<ArticleDescription, "id">) {
-    const pct = useRecoilValue(currentArticleReadingProgressSelector(id));
-
-    if (pct === 100) {
-        return (
-            <View>
-                <View>
-                    <FilledTick />
-                </View>
-                <Text className="text-zinc-300 font-light text">Read</Text>
-            </View>
-        );
-    }
-
-    if (pct === 0) {
-        return (
-            <View>
-                <View>
-                    <Eye />
-                </View>
-                <Text className="text-zinc-300 font-light text">Unread</Text>
-            </View>
-        );
-    }
-
-    return (
-        <View>
-            <View>
-                <UnfilledTick />
-            </View>
-            <Text className="text-zinc-300 font-light text">{pct}% read</Text>
         </View>
     );
 }

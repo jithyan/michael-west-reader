@@ -1,16 +1,13 @@
 import parse, { NodeType } from "node-html-parser";
-import { useId } from "react";
 import { View, Text, Image } from "react-native";
-import { InView } from "react-native-intersection-observer";
-import { useSetRecoilState } from "recoil";
 import htmlToReactParser, {
     HTMLReactParserOptions,
     Element,
     domToReact,
 } from "html-react-parser";
-import { paragraphsReadForCurrentArticleSelector } from "./article-state";
 import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
 import { h64 } from "xxhashjs";
+import { RegisterViewPortAwareness } from "./RegisterViewPortAwareness";
 
 const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
     const paragraph = { count: 0 };
@@ -131,33 +128,6 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
     };
 
     return { options, paragraph };
-};
-
-const RegisterViewPortAwareness = ({
-    children,
-    storyId,
-    hash,
-}: {
-    children: JSX.Element;
-    storyId: string;
-    hash: string;
-}) => {
-    const setParagraphAsRead = useSetRecoilState(
-        paragraphsReadForCurrentArticleSelector(storyId)
-    );
-
-    return (
-        <InView
-            triggerOnce={true}
-            onChange={(InView) => {
-                if (InView) {
-                    setParagraphAsRead(hash);
-                }
-            }}
-        >
-            {children}
-        </InView>
-    );
 };
 
 export async function parseArticle({
