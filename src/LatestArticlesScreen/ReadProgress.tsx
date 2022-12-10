@@ -8,7 +8,9 @@ function ProgressRow({ icon, text }: { icon: JSX.Element; text: string }) {
     return (
         <View className="flex-initial flex-row mx-2 my-2">
             <View className="mx-1">{icon}</View>
-            <Text className="text-zinc-300 font-light text">{text}</Text>
+            <Text className="text-zinc-300 font-light text-xs pt-1">
+                {text}
+            </Text>
         </View>
     );
 }
@@ -24,5 +26,5 @@ export function ReadProgress({ id }: Pick<ArticleDescription, "id">) {
         return <ProgressRow icon={<Eye />} text="Unread" />;
     }
 
-    return <ProgressRow icon={<UnfilledTick />} text={`${pct}% read`} />;
+    return <ProgressRow icon={<UnfilledTick />} text={`${pct}% Read`} />;
 }

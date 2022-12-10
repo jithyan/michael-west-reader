@@ -23,6 +23,7 @@ import { LoadingSpinner } from "../core/components";
 import { compareDesc } from "date-fns/esm";
 import { format, getDayOfYear } from "date-fns";
 import { ReadProgress } from "./ReadProgress";
+import { SvgCssUri, SvgUri } from "react-native-svg";
 
 const fetchAndParseArticles = (category: Category, pageNumber: number) =>
     getLatestArticlesHTMLPageForCategory(category, pageNumber).then(
@@ -57,8 +58,6 @@ export const latestArticlesList = selector({
             fetchAndParseArticles("news", 3),
             fetchAndParseArticles("news", 4),
             fetchAndParseArticles("news", 5),
-            fetchAndParseArticles("news", 6),
-            fetchAndParseArticles("news", 7),
             fetchAndParseArticles("story", 1),
             fetchAndParseArticles("story", 2),
         ]);
@@ -80,7 +79,7 @@ function NewsItem({
     return (
         <>
             <View className="basis-2/3">
-                <Text className="text-zinc-300 font-extrabold text-xl p-0.5">
+                <Text className="text-zinc-200 font-extrabold text-xl p-0.5">
                     {title}
                 </Text>
                 <View className="flex-initial flex-row">
@@ -127,7 +126,7 @@ function StoryItem({
                 </View>
             </View>
             <View className="basis-full rounded-md  my-0.5">
-                <Text className=" text-zinc-300 font-extrabold text-xl p-0.5">
+                <Text className=" text-zinc-200 font-extrabold text-xl p-0.5">
                     {title}
                 </Text>
             </View>
@@ -164,7 +163,7 @@ function Article({
 
 function DateItem({ date }: { date: string }) {
     return (
-        <View className=" bg-yellow-500 flex-initial flex-row px-1 py-2 my-1 border-solid border-b-2 border-sky-800 rounded-lg">
+        <View className=" bg-yellow-500 flex-initial flex-row px-4 py-2 my-2 border-solid border-b-2 border-sky-800 rounded-lg">
             <Text className="text-zinc-800 font-extrabold text-md mr-1">
                 {date}
             </Text>
@@ -177,7 +176,18 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
     return (
         <FlatList
             className="my-8"
-            data={addDateItems(latestStories)}
+            data={[
+                <View className=" bg-slate-200 rounded-xl flex-shrink flex-row border-solid">
+                    <SvgCssUri
+                        className="p-0 m-0 aspect-video"
+                        color="white"
+                        width="100%"
+                        height="100%"
+                        uri="https://michaelwest.com.au/wp-content/uploads/2022/03/MWMlogo-un1-1.svg"
+                    />
+                </View>,
+                ...addDateItems(latestStories),
+            ]}
             renderItem={({ item }) =>
                 isArticleDescription(item) ? (
                     <Article
@@ -190,12 +200,18 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
                             });
                         }}
                     />
-                ) : (
+                ) : typeof item === "string" ? (
                     <DateItem date={item} />
+                ) : (
+                    item
                 )
             }
             keyExtractor={(item) =>
-                isArticleDescription(item) ? item.id : item
+                isArticleDescription(item)
+                    ? item.id
+                    : typeof item === "string"
+                    ? item
+                    : "coverImage"
             }
         />
     );
