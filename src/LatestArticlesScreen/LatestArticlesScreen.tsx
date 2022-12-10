@@ -8,31 +8,62 @@ import {
     Pressable,
 } from "react-native";
 import { selector, useRecoilValue, useSetRecoilState } from "recoil";
-import { getLatestArticlesHTMLPageForCategory } from "./articles-list-page-api";
+import {
+    Category,
+    getLatestArticlesHTMLPageForCategory,
+} from "./articles-list-page-api";
 import {
     ArticleDescription,
     parseLatestArticlesHTMLPage,
 } from "./articles-list-page-parser";
-import { toSentenceCase } from "../core/util";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { LoadingSpinner } from "../core/components";
+import { compareDesc } from "date-fns/esm";
+import { format, getDayOfYear } from "date-fns";
+import { currentArticleReadingProgressSelector } from "../ArticleScreen/article-state";
+
+const fetchAndParseArticles = (category: Category, pageNumber: number) =>
+    getLatestArticlesHTMLPageForCategory(category, pageNumber).then(
+        (latestNewsPageBody) =>
+            parseLatestArticlesHTMLPage(latestNewsPageBody, category)
+    );
+
+function addDateItems(
+    articles: ArticleDescription[]
+): Array<ArticleDescription | string> {
+    let currentDay = -1;
+    return articles
+        .map((article, i) => {
+            if (
+                i === articles.length ||
+                currentDay === getDayOfYear(article.date)
+            ) {
+                return [article];
+            }
+            currentDay = getDayOfYear(article.date);
+            return [format(article.date, "PPPP"), article];
+        })
+        .flatMap((a) => a);
+}
 
 export const latestArticlesList = selector({
     key: "latestArticlesList",
     get: async () => {
         const articles = await Promise.all([
-            getLatestArticlesHTMLPageForCategory("news").then(
-                (latestNewsPageBody) =>
-                    parseLatestArticlesHTMLPage(latestNewsPageBody, "news")
-            ),
-            getLatestArticlesHTMLPageForCategory("story").then(
-                (latestStoriesPageBody) =>
-                    parseLatestArticlesHTMLPage(latestStoriesPageBody, "story")
-            ),
+            fetchAndParseArticles("news", 1),
+            fetchAndParseArticles("news", 2),
+            fetchAndParseArticles("news", 3),
+            fetchAndParseArticles("news", 4),
+            fetchAndParseArticles("news", 5),
+            fetchAndParseArticles("story", 1),
+            fetchAndParseArticles("story", 2),
         ]);
 
-        return articles.flatMap((a) => a);
+        const flattened = articles.flatMap((a) => a);
+        flattened.sort((a, b) => compareDesc(a.date, b.date));
+
+        return flattened;
     },
 });
 
@@ -108,6 +139,39 @@ function StoryItem({
     );
 }
 
+export function ReadProgress() {
+    const pct = useRecoilValue(currentArticleReadingProgressSelector);
+
+    // if (pct === 100) {
+    //     return (
+    //         <View>
+    //             <View>
+    //                 <FilledTick />
+    //             </View>
+    //             <Text>Read</Text>
+    //         </View>
+    //     );
+    // }
+
+    // if (pct === 0) {
+    //     <View>
+    //         <View>
+    //             <Eye />
+    //         </View>
+    //         <Text>Unread</Text>
+    //     </View>;
+    // }
+
+    return (
+        <View>
+            {/* <View>
+                <UnfilledTick />
+            </View> */}
+            <Text>read</Text>;
+        </View>
+    );
+}
+
 function Article({
     category,
     onTouch,
@@ -126,26 +190,39 @@ function Article({
     );
 }
 
+function DateItem({ date }: { date: string }) {
+    return (
+        <View className=" bg-yellow-500 flex-initial flex-row px-1 py-2 my-1 border-solid border-b-2 border-slate-500">
+            <Text className="text-zinc-800 font-extrabold text-md mr-1">
+                {date}
+            </Text>
+        </View>
+    );
+}
+
 function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
     const latestStories = useRecoilValue(latestArticlesList);
-
     return (
         <FlatList
             className="my-8"
-            data={latestStories}
-            renderItem={({ item }) => (
-                <Article
-                    {...item}
-                    onTouch={() => {
-                        navigation.navigate("ArticleScreen", {
-                            id: item.id,
-                            storyURL: item.storyURL,
-                            title: item.title,
-                        });
-                    }}
-                />
-            )}
-            keyExtractor={(item) => item.id}
+            data={addDateItems(latestStories)}
+            renderItem={({ item }) =>
+                typeof item === "string" ? (
+                    <DateItem date={item} />
+                ) : (
+                    <Article
+                        {...item}
+                        onTouch={() => {
+                            navigation.navigate("ArticleScreen", {
+                                id: item.id,
+                                storyURL: item.storyURL,
+                                title: item.title,
+                            });
+                        }}
+                    />
+                )
+            }
+            keyExtractor={(item) => (typeof item === "string" ? item : item.id)}
         />
     );
 }
