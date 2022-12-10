@@ -177,7 +177,7 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
         <FlatList
             className="my-8"
             data={[
-                <View className=" bg-slate-200 rounded-xl flex-shrink flex-row border-solid">
+                <View className="p-0 my-2 mx-6 bg-slate-200 rounded-xl flex-shrink flex-row border-solid">
                     <SvgCssUri
                         className="p-0 m-0 aspect-video"
                         color="white"
