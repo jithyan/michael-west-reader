@@ -3,6 +3,15 @@ import { ParsingError } from "../core/errors";
 import { Category } from "./articles-list-page-api";
 import { parse as dateParse, set } from "date-fns";
 
+export function isArticleDescription(obj: any): obj is ArticleDescription {
+    return (
+        typeof obj === "object" &&
+        Boolean(obj.id) &&
+        Boolean(obj.title) &&
+        Boolean(obj.storyURL)
+    );
+}
+
 function parseDateWithoutTime(dateString: string): Date {
     return set(dateParse(dateString, "MMMM d, yyyy", new Date()), {
         hours: 23,

@@ -14,6 +14,7 @@ import {
 } from "./articles-list-page-api";
 import {
     ArticleDescription,
+    isArticleDescription,
     parseLatestArticlesHTMLPage,
 } from "./articles-list-page-parser";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -22,6 +23,7 @@ import { LoadingSpinner } from "../core/components";
 import { compareDesc } from "date-fns/esm";
 import { format, getDayOfYear } from "date-fns";
 import { currentArticleReadingProgressSelector } from "../ArticleScreen/article-state";
+import { FilledTick, Eye, UnfilledTick } from "../core/icons";
 
 const fetchAndParseArticles = (category: Category, pageNumber: number) =>
     getLatestArticlesHTMLPageForCategory(category, pageNumber).then(
@@ -142,31 +144,31 @@ function StoryItem({
 export function ReadProgress() {
     const pct = useRecoilValue(currentArticleReadingProgressSelector);
 
-    // if (pct === 100) {
-    //     return (
-    //         <View>
-    //             <View>
-    //                 <FilledTick />
-    //             </View>
-    //             <Text>Read</Text>
-    //         </View>
-    //     );
-    // }
+    if (pct === 100) {
+        return (
+            <View>
+                <View>
+                    <FilledTick />
+                </View>
+                <Text>Read</Text>
+            </View>
+        );
+    }
 
-    // if (pct === 0) {
-    //     <View>
-    //         <View>
-    //             <Eye />
-    //         </View>
-    //         <Text>Unread</Text>
-    //     </View>;
-    // }
+    if (pct === 0) {
+        <View>
+            <View>
+                <Eye />
+            </View>
+            <Text>Unread</Text>
+        </View>;
+    }
 
     return (
         <View>
-            {/* <View>
+            <View>
                 <UnfilledTick />
-            </View> */}
+            </View>
             <Text>read</Text>;
         </View>
     );
@@ -207,9 +209,7 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
             className="my-8"
             data={addDateItems(latestStories)}
             renderItem={({ item }) =>
-                typeof item === "string" ? (
-                    <DateItem date={item} />
-                ) : (
+                isArticleDescription(item) ? (
                     <Article
                         {...item}
                         onTouch={() => {
@@ -220,9 +220,13 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
                             });
                         }}
                     />
+                ) : (
+                    <DateItem date={item} />
                 )
             }
-            keyExtractor={(item) => (typeof item === "string" ? item : item.id)}
+            keyExtractor={(item) =>
+                isArticleDescription(item) ? item.id : item
+            }
         />
     );
 }
