@@ -1,5 +1,5 @@
 import parse, { NodeType } from "node-html-parser";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Pressable, Linking } from "react-native";
 import htmlToReactParser, {
     HTMLReactParserOptions,
     Element,
@@ -46,10 +46,20 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                         if ((domNode.firstChild as any)?.name === "img") {
                             return <>{parseChildren()}</>;
                         }
+
+                        const { href } = domNode.attribs ?? {};
+
                         return (
-                            <Text className="text-sky-600 underline">
-                                {parseChildren()}
-                            </Text>
+                            <Pressable
+                                onPress={() => {
+                                    Linking.openURL(href);
+                                }}
+                                className="pl-1 pt-3.5"
+                            >
+                                <Text className="text-base font-normal text-sky-600 underline">
+                                    {parseChildren()}
+                                </Text>
+                            </Pressable>
                         );
 
                     case "div":
