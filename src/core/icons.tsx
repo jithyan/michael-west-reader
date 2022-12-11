@@ -30,13 +30,13 @@ export function UnfilledTick() {
     );
 }
 
-export function Eye() {
+export function Eye({ color = "#e7e5e4" }: { color?: string }) {
     return (
         <Svg
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="#e7e5e4"
+            stroke={color}
             className="w-6 h-6"
         >
             <Path
