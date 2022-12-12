@@ -31,7 +31,7 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                             return <></>;
                         }
                         return (
-                            <View className="bg-gray-400 p-2 mx-4 my-4 rounded-md">
+                            <View className="bg-slate-300 border-solid border-2 border-slate-400 p-2 mx-4 my-4 rounded-md">
                                 {parseChildren()}
                             </View>
                         );
