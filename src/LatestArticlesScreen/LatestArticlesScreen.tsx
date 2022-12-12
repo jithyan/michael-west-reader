@@ -1,29 +1,54 @@
-import React, { Suspense } from "react";
-import {
-    SafeAreaView,
-    FlatList,
-    Text,
-    View,
-    Image,
-    Pressable,
-} from "react-native";
+import React, { Suspense, useMemo } from "react";
+import { SafeAreaView, FlatList } from "react-native";
 import { useRecoilValue } from "recoil";
-import {
-    ArticleDescription,
-    isArticleDescription,
-} from "./articles-list-page-parser";
+import { ArticleDescription } from "./articles-list-page-parser";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import { LoadingSpinner, Show } from "../core/components";
 import { format, getDayOfYear } from "date-fns";
-import { ReadProgress } from "./ReadProgress";
-import { SvgCssUri } from "react-native-svg";
 import { DebugStats } from "../core/debug";
 import { latestArticlesList } from "./articles-list-state";
+import { Article } from "./article-list-item-components";
+import { DateItem, MichaelWestSVG } from "./other-list-item-components";
 
-function addDateItems(
-    articles: ArticleDescription[]
-): Array<ArticleDescription | string> {
+function toArticleProps(
+    articles: ArticleDescription[],
+    navigation: HomeProps["navigation"]
+): ArticleProps[] {
+    return articles.map((article) => ({
+        ...article,
+        type: "article",
+        key: article.id,
+        onTouch: () => {
+            navigation.navigate("ArticleScreen", {
+                id: article.id,
+                storyURL: article.storyURL,
+                title: article.title,
+            });
+        },
+    }));
+}
+
+function toDateItemProp(date: Date): DateItemProps {
+    const formattedDate = format(date, "PPPP");
+    return {
+        type: "date",
+        date: formattedDate,
+        key: formattedDate,
+    };
+}
+
+function toStaticItemProp(key: string, element: JSX.Element): StaticItemProps {
+    return {
+        type: "static",
+        key,
+        element,
+    };
+}
+
+function groupArticlePropsByDateItemProps(
+    articles: ArticleProps[]
+): Array<ArticleProps | DateItemProps> {
     let currentDay = -1;
     return articles
         .map((article, i) => {
@@ -34,156 +59,55 @@ function addDateItems(
                 return [article];
             }
             currentDay = getDayOfYear(article.date);
-            return [format(article.date, "PPPP"), article];
+            return [toDateItemProp(article.date), article];
         })
         .flatMap((a) => a);
 }
 
-function NewsItem({
-    id,
-    title,
-    imageURL,
-    author,
-    published,
-}: Omit<ArticleDescription, "category">) {
-    return (
-        <>
-            <View className="basis-2/3">
-                <Text className="text-zinc-200 font-extrabold text-xl p-0.5">
-                    {title}
-                </Text>
-                <View className="flex-initial flex-row">
-                    <Text className="text-zinc-300 font-light text-xs mr-1">
-                        {author}
-                    </Text>
-                    <Text className="text-zinc-300 font-light text-xs">
-                        {published}
-                    </Text>
-                </View>
-                <ReadProgress id={id} />
-            </View>
-            <View className="basis-1/3">
-                <Text className="text-zinc-800 bg-amber-500 text-center text-xs rounded-t-md">
-                    News
-                </Text>
-                <Image
-                    className="aspect-square rounded-b-md"
-                    source={{ uri: imageURL }}
-                />
-            </View>
-        </>
-    );
-}
+type ArticleProps = ArticleDescription & {
+    type: "article";
+    key: string;
+    onTouch: () => void;
+};
+type DateItemProps = { type: "date"; key: string; date: string };
+type StaticItemProps = { type: "static"; key: string; element: JSX.Element };
 
-function StoryItem({
-    id,
-    title,
-    imageURL,
-    author,
-    published,
-}: Omit<ArticleDescription, "category">) {
-    return (
-        <View className="flex-initial flex-col">
-            <View className=" bg-amber-500 rounded-md px-0.5 pt-0.5">
-                <Text className=" text-zinc-800 font-extrabold text-md px-2">
-                    Story
-                </Text>
-                <View className=" basis-full my-0.5">
-                    <Image
-                        className="aspect-video rounded-md"
-                        source={{ uri: imageURL }}
-                    />
-                </View>
-            </View>
-            <View className="basis-full rounded-md  my-0.5">
-                <Text className=" text-zinc-200 font-extrabold text-xl p-0.5">
-                    {title}
-                </Text>
-            </View>
-            <View className="flex-initial flex-row">
-                <Text className="text-zinc-300 font-light text-xs mr-1">
-                    {author}
-                </Text>
-                <Text className="text-zinc-300 font-light text-xs">
-                    {published}
-                </Text>
-            </View>
-            <ReadProgress id={id} />
-        </View>
-    );
-}
+type ListItemProps = ArticleProps | DateItemProps | StaticItemProps;
 
-function Article({
-    category,
-    onTouch,
-    ...rest
-}: ArticleDescription & { onTouch: () => void }) {
-    return (
-        <Pressable onPress={onTouch}>
-            <View className="flex-initial flex-row px-1 py-2 my-1 border-solid border-b-2 border-slate-500">
-                {category === "news" ? (
-                    <NewsItem {...rest} />
-                ) : (
-                    <StoryItem {...rest} />
-                )}
-            </View>
-        </Pressable>
-    );
-}
+function ListItem(props: ListItemProps) {
+    switch (props.type) {
+        case "article":
+            return <Article {...props} />;
 
-function DateItem({ date }: { date: string }) {
-    return (
-        <View className=" bg-yellow-500 flex-initial flex-row px-4 py-2 my-2 border-solid border-b-2 border-sky-800 rounded-lg">
-            <Text className="text-zinc-800 font-extrabold text-md mr-1">
-                {date}
-            </Text>
-        </View>
-    );
+        case "date":
+            return <DateItem {...props} />;
+
+        case "static":
+            return props.element;
+
+        default:
+            throw new Error(`Unknown list item type: ${props}`);
+    }
 }
 
 function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
     const latestStories = useRecoilValue(latestArticlesList);
+    const listItems: ListItemProps[] = useMemo(
+        () => [
+            toStaticItemProp("michael-west-svg", MichaelWestSVG),
+            ...groupArticlePropsByDateItemProps(
+                toArticleProps(latestStories, navigation)
+            ),
+        ],
+        [latestStories, navigation]
+    );
 
     return (
         <FlatList
             className="my-8"
-            data={[
-                <View className="p-0 my-2 mx-6 bg-slate-200 rounded-xl flex-shrink flex-row border-solid">
-                    <SvgCssUri
-                        className="p-0 m-0 aspect-video"
-                        color="white"
-                        width="100%"
-                        height="100%"
-                        uri="https://michaelwest.com.au/wp-content/uploads/2022/03/MWMlogo-un1-1.svg"
-                    />
-                </View>,
-                ...addDateItems(latestStories),
-            ]}
-            renderItem={({ item }) =>
-                isArticleDescription(item) ? (
-                    <Article
-                        {...item}
-                        onTouch={() => {
-                            navigation.navigate("ArticleScreen", {
-                                id: item.id,
-                                storyURL: item.storyURL,
-                                title: item.title,
-                            });
-                        }}
-                    />
-                ) : typeof item === "string" ? (
-                    <DateItem date={item} />
-                ) : (
-                    item
-                )
-            }
-            keyExtractor={(item) =>
-                isArticleDescription(item)
-                    ? item.id
-                    : typeof item === "string"
-                    ? item
-                    : "coverImage"
-            }
+            data={listItems}
+            renderItem={({ item }) => <ListItem {...item} />}
+            keyExtractor={(item) => item.key}
         />
     );
 }
@@ -195,7 +119,7 @@ type HomeProps = NativeStackScreenProps<
 
 export function LatestArticlesScreen({ route, navigation }: HomeProps) {
     return (
-        <SafeAreaView className="container bg-sky-900 px-4 py-2">
+        <SafeAreaView className="container bg-sky-900 px-4 py-4 mb-8">
             <Suspense
                 fallback={<LoadingSpinner text="Fetching latest articles..." />}
             >
