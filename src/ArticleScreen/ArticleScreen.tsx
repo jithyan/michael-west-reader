@@ -56,34 +56,34 @@ export function ArticleScreen({ route }: ArticleProps) {
                             }
                         >
                             <ArticleBody storyURL={storyURL} id={id} />
-                            <View className=" flex-none flex-col">
-                                <Pressable
-                                    className=" bg-amber-600 rounded-md p-4 -mt-4 mb-8"
-                                    onPress={() => {
-                                        Linking.openURL(
-                                            "https://michaelwest.com.au/support-us/"
-                                        );
-                                    }}
-                                >
-                                    <Text className="font-extrabold mb-1">
-                                        Don't pay so you can read it.
-                                    </Text>
-                                    <Text className=" font-semibold mb-1">
-                                        Pay so that{" "}
-                                        <Text className="font-semibold italic">
-                                            everyone
-                                        </Text>{" "}
-                                        can.
-                                    </Text>
-                                    <Text className=" text-white">
-                                        Press here to become a supporter
-                                    </Text>
-                                </Pressable>
-                            </View>
+                            <SupportMichaelWestSection />
                         </React.Suspense>
                     </ScrollView>
                 </IOScrollView>
             </View>
         </SafeAreaView>
+    );
+}
+
+function SupportMichaelWestSection() {
+    return (
+        <View className=" flex-none flex-col bg-amber-600 rounded-md p-4 -mt-4 mb-4">
+            <Pressable
+                onPress={() => {
+                    Linking.openURL("https://michaelwest.com.au/support-us/");
+                }}
+            >
+                <Text className="font-extrabold mb-1">
+                    Don't pay so you can read it.
+                </Text>
+                <Text className=" font-semibold mb-1">
+                    Pay so that{" "}
+                    <Text className="font-semibold italic">everyone</Text> can.
+                </Text>
+                <Text className=" text-white">
+                    Press here to become a supporter
+                </Text>
+            </Pressable>
+        </View>
     );
 }

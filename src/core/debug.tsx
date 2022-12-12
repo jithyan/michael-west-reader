@@ -17,7 +17,7 @@ export function DebugReadProgress({ id }: { id: string }) {
     const pct = useRecoilValue(currentArticleReadingProgressSelector(id));
 
     return (
-        <View className="mb-1 border-solid border-2 border-red-400 flex-row flex-initial">
+        <View className="border-solid border-2 border-red-400 flex-row flex-initial">
             <Text>
                 r:{numRead} t:{total} {pct}%
             </Text>
