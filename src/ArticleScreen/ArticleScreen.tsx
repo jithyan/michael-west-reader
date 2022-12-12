@@ -3,11 +3,12 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../App";
 import React, { useEffect } from "react";
 import { selectorFamily, useRecoilValue, useSetRecoilState } from "recoil";
-import { LoadingSpinner } from "../core/components";
+import { LoadingSpinner, Show } from "../core/components";
 import { IOScrollView } from "react-native-intersection-observer";
 import { totalParagraphsForCurrentArticleSelector } from "./article-state";
 import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
 import { parseArticle } from "./article-page-parser";
+import { DebugReadProgress } from "../core/debug";
 
 export const getParsedArticleFromURLSelector = selectorFamily({
     key: "parsedArticle",
@@ -39,6 +40,9 @@ export function ArticleScreen({ route }: ArticleProps) {
 
     return (
         <View className="container bg-zinc-200 p-1">
+            <Show when={process.env.NODE_ENV === "development"}>
+                <DebugReadProgress id={id} />
+            </Show>
             <IOScrollView>
                 <ScrollView className="p-1">
                     <Text className="px-2 mt-2 mb-0.5 text-2xl font-extrabold">
@@ -50,7 +54,7 @@ export function ArticleScreen({ route }: ArticleProps) {
                         <ArticleBody storyURL={storyURL} id={id} />
                         <View className=" flex-none flex-col">
                             <Pressable
-                                className=" bg-amber-600 rounded-md p-4 -mt-16 mb-2"
+                                className=" bg-amber-600 rounded-md p-4 -mt-4 mb-8"
                                 onPress={() => {
                                     Linking.openURL(
                                         "https://michaelwest.com.au/support-us/"

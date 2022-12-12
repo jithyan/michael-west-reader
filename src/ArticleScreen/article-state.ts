@@ -1,7 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { atom, DefaultValue, selectorFamily } from "recoil";
-import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
-import { parseArticle } from "./article-page-parser";
 import { Map, Set } from "immutable";
 
 type ParagraphsReadCacheObject = Record<string, string[]>;
