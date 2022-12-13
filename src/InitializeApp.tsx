@@ -1,8 +1,8 @@
 import { Suspense, useEffect } from "react";
 import { RecoilRoot, useRecoilValue, useSetRecoilState } from "recoil";
-import { paragraphsReadAtom } from "./ArticleScreen/article-state";
 import { LoadingSpinner } from "./core/components";
-import { latestArticlesList } from "./LatestArticlesScreen/articles-list-state";
+import { paragraphsReadAtom } from "./screens/ArticleScreen/article-state";
+import { latestArticlesList } from "./screens/LatestArticlesScreen/articles-list-state";
 
 export function InitializeApp({ children }: { children: JSX.Element }) {
     return (

@@ -7,8 +7,8 @@ import {
     currentArticleReadingProgressSelector,
     paragraphsReadAtom,
     totalNumParagraphsAtom,
-} from "../ArticleScreen/article-state";
-import { latestArticlesList } from "../LatestArticlesScreen/articles-list-state";
+} from "../screens/ArticleScreen/article-state";
+import { latestArticlesList } from "../screens/LatestArticlesScreen/articles-list-state";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function DebugReadProgress({ id }: { id: string }) {

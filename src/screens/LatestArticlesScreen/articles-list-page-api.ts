@@ -1,4 +1,4 @@
-import { NetworkError } from "../core/errors";
+import { NetworkError } from "../../core/errors";
 
 type CategoriesBaseUrl = "https://michaelwest.com.au/category/";
 type CategoriesSubPath = "aap-news/" | "latest-posts/";

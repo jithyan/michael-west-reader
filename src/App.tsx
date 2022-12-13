@@ -1,10 +1,10 @@
 import { registerRootComponent } from "expo";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { LatestArticlesScreen } from "./LatestArticlesScreen/LatestArticlesScreen";
-import { ArticleScreen } from "./ArticleScreen/ArticleScreen";
-import { ArticleDescription } from "./LatestArticlesScreen/articles-list-page-parser";
 import { InitializeApp } from "./InitializeApp";
+import { ArticleScreen } from "./screens/ArticleScreen/ArticleScreen";
+import { ArticleDescription } from "./screens/LatestArticlesScreen/articles-list-page-parser";
+import { LatestArticlesScreen } from "./screens/LatestArticlesScreen/LatestArticlesScreen";
 
 const Stack = createNativeStackNavigator();
 
