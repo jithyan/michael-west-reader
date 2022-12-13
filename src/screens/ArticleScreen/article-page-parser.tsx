@@ -5,8 +5,8 @@ import htmlToReactParser, {
     Element,
     domToReact,
 } from "html-react-parser";
-import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
 import { h64 } from "xxhashjs";
+import { ArticleDescription } from "~screens/LatestArticlesScreen/articles-list-page-parser";
 import { RegisterViewPortAwareness } from "./RegisterViewPortAwareness";
 
 const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
@@ -20,7 +20,7 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
             ) {
                 return <Text>{(domNode as any).data.trim()}</Text>;
             } else if (domNode instanceof Element && domNode.attribs) {
-                const { name, nodeType } = domNode;
+                const { name } = domNode;
                 const { children } = domNode;
 
                 const parseChildren = () => domToReact(children, options);

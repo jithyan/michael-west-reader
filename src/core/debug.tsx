@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { View, Text } from "react-native";
 import { useRecoilValue } from "recoil";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     paragraphsReadForCurrentArticleSelector,
     totalParagraphsForCurrentArticleSelector,
     currentArticleReadingProgressSelector,
     paragraphsReadAtom,
     totalNumParagraphsAtom,
-} from "../screens/ArticleScreen/article-state";
-import { latestArticlesList } from "../screens/LatestArticlesScreen/articles-list-state";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+} from "~screens/ArticleScreen/article-state";
+import { latestArticlesList } from "~screens/LatestArticlesScreen/articles-list-state";
 
 export function DebugReadProgress({ id }: { id: string }) {
     const numRead = useRecoilValue(paragraphsReadForCurrentArticleSelector(id));

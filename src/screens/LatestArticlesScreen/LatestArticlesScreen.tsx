@@ -1,12 +1,12 @@
 import React, { Suspense, useMemo } from "react";
 import { SafeAreaView, FlatList } from "react-native";
 import { useRecoilValue } from "recoil";
-import { ArticleDescription } from "./articles-list-page-parser";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../App";
-import { LoadingSpinner, Show } from "../../core/components";
 import { format, getDayOfYear } from "date-fns";
-import { DebugStats } from "../../core/debug";
+import { ArticleDescription } from "./articles-list-page-parser";
+import { RootStackParamList } from "../../App";
+import { LoadingSpinner, Show } from "~core/components";
+import { DebugStats } from "~core/debug";
 import { latestArticlesList } from "./articles-list-state";
 import { Article } from "./article-list-item-components";
 import { DateItem, MichaelWestSVG } from "./other-list-item-components";

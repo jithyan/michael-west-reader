@@ -1,7 +1,7 @@
 import { parse, HTMLElement } from "node-html-parser";
-import { ParsingError } from "../../core/errors";
-import { Category } from "./articles-list-page-api";
 import { parse as dateParse, set } from "date-fns";
+import { ParsingError } from "~core/errors";
+import { Category } from "./articles-list-page-api";
 
 export function isArticleDescription(obj: any): obj is ArticleDescription {
     return (

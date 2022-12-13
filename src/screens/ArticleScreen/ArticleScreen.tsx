@@ -1,15 +1,15 @@
 import { View, Text, ScrollView, Pressable, Linking } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../App";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect } from "react";
 import { selectorFamily, useRecoilValue, useSetRecoilState } from "recoil";
-import { LoadingSpinner, Show } from "../../core/components";
 import { IOScrollView } from "react-native-intersection-observer";
+import { RootStackParamList } from "../../App";
+import { LoadingSpinner, Show } from "~core/components";
+import { ArticleDescription } from "~screens/LatestArticlesScreen/articles-list-page-parser";
+import { DebugReadProgress } from "~core/debug";
 import { totalParagraphsForCurrentArticleSelector } from "./article-state";
-import { ArticleDescription } from "../LatestArticlesScreen/articles-list-page-parser";
 import { parseArticle } from "./article-page-parser";
-import { DebugReadProgress } from "../../core/debug";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export const getParsedArticleFromURLSelector = selectorFamily({
     key: "parsedArticle",
