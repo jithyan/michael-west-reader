@@ -9,6 +9,7 @@ module.exports = function (api) {
                     alias: {
                         "~screens": "./src/screens",
                         "~core": "./src/core",
+                        "~types": "./src/types",
                     },
                 },
             ],

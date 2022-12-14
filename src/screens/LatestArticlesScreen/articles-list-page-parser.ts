@@ -2,6 +2,8 @@ import { parse, HTMLElement } from "node-html-parser";
 import { parse as dateParse, set } from "date-fns";
 import { ParsingError } from "~core/errors";
 import { Category } from "./articles-list-page-api";
+import { h64 } from "xxhashjs";
+import { ARTICLE_ID_SEED } from "~core/seeds";
 
 export function isArticleDescription(obj: any): obj is ArticleDescription {
     return (
@@ -35,10 +37,11 @@ class Article implements ArticleDescription {
     readonly date: Date;
 
     constructor(article: HTMLElement, category: Category) {
-        const { storyURL, title } = extractTitleAndURLFromArticle(article);
+        const { storyURL, title, id } =
+            extractTitleIdAndURLFromArticle(article);
 
         this.title = title;
-        this.id = extractIdFromArticle(article);
+        this.id = id;
         this.storyURL = storyURL;
         this.imageURL = extractImageURLFromArticle(article);
         this.summary = extractSummaryFromArticle(article);
@@ -71,9 +74,10 @@ function parseArticle(
     return new Article(article, category);
 }
 
-function extractTitleAndURLFromArticle(article: HTMLElement): {
+function extractTitleIdAndURLFromArticle(article: HTMLElement): {
     title: string;
     storyURL: string;
+    id: string;
 } {
     const h2Tag = article.querySelector("h2");
     const title = h2Tag?.textContent?.trim();
@@ -83,18 +87,13 @@ function extractTitleAndURLFromArticle(article: HTMLElement): {
         throw new Error("Parsing error: Article heading  not present");
     }
 
+    const id = h64(ARTICLE_ID_SEED).update(storyURL).digest().toString();
+
     return {
+        id,
         title,
         storyURL,
     };
-}
-
-function extractIdFromArticle(article: HTMLElement): string {
-    const id = article.id?.trim();
-    if (!id) {
-        throw new Error("Parsing error: Article id not present");
-    }
-    return id;
 }
 
 function extractImageURLFromArticle(article: HTMLElement): string {
@@ -125,7 +124,7 @@ export function parseLatestArticlesHTMLPage(
         const uniqueArticles: ArticleDescription[] = [];
 
         for (const article of articles) {
-            const id = extractIdFromArticle(article);
+            const { id } = extractTitleIdAndURLFromArticle(article);
             if (!articleIds.has(id)) {
                 articleIds.add(id);
                 uniqueArticles.push(parseArticle(article, category));
