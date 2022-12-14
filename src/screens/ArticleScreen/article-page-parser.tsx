@@ -143,7 +143,9 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                     case "p":
                         const textNodes = domNode.childNodes
                             .filter((n) => n.nodeType === NodeType.TEXT_NODE)
-                            .map((n) => (n as any).data as string);
+                            .map((n) => (n as any).data as string)
+                            .filter(Boolean);
+
                         paragraph.count++;
 
                         const hash = textNodes
@@ -151,6 +153,8 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                                 (prev, curr) => prev.update(curr),
                                 h64(ARTICLE_SECTION_READ_SEED)
                             )
+                            .update(id)
+                            .update(paragraph.count.toFixed(0))
                             .digest()
                             .toString();
 

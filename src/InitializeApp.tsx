@@ -1,3 +1,4 @@
+import { Map } from "immutable";
 import { Suspense, useEffect } from "react";
 import { RecoilRoot, useRecoilValue, useSetRecoilState } from "recoil";
 import { LoadingSpinner } from "~core/components";
@@ -36,38 +37,25 @@ function PruneItemsFromStorage() {
     useEffect(() => {
         const currentStoryIds = new Set(latestStories.map((s) => s.id));
 
-        setParagraphsRead((prev) => {
-            const staleIdsToRemove = [];
-
-            prev.forEach((_, k) => {
-                if (!currentStoryIds.has(k)) {
-                    staleIdsToRemove.push(k);
-                }
-            });
-
-            console.debug(
-                "staleIdsToRemove - paragraphs read",
-                staleIdsToRemove
-            );
-            return prev.deleteAll(staleIdsToRemove);
-        });
-
-        setTotalParagraphs((prev) => {
-            const staleIdsToRemove = [];
-
-            prev.forEach((_, k) => {
-                if (!currentStoryIds.has(k)) {
-                    staleIdsToRemove.push(k);
-                }
-            });
-
-            console.debug(
-                "staleIdsToRemove - total paragraphs",
-                staleIdsToRemove
-            );
-            return prev.deleteAll(staleIdsToRemove);
-        });
+        setParagraphsRead(removeStaleIds(currentStoryIds));
+        setTotalParagraphs(removeStaleIds(currentStoryIds));
     }, [latestStories]);
 
     return null;
+}
+
+function removeStaleIds(
+    currentStoryIds: Set<string>
+): (mapFromStorage: Map<string, any>) => Map<string, any> {
+    return (mapFromStorage) => {
+        const staleIdsToRemove: string[] = [];
+
+        mapFromStorage.forEach((_, k) => {
+            if (!currentStoryIds.has(k)) {
+                staleIdsToRemove.push(k);
+            }
+        });
+
+        return mapFromStorage.deleteAll(staleIdsToRemove);
+    };
 }
