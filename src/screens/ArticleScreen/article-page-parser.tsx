@@ -12,11 +12,6 @@ import { RegisterViewPortAwareness } from "./RegisterViewPortAwareness";
 import { ARTICLE_SECTION_READ_SEED } from "~core/seeds";
 import { ArticleText } from "~core/components";
 
-type ElemParser = (
-    domNode: Element,
-    meta: { storyId: string; paragraph: { count: number } }
-) => void;
-
 function isTextNodeWithData(
     domNode: DOMNode
 ): domNode is DOMNode & { data: string } {
@@ -88,7 +83,8 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                         if (
                             domNode.attribs?.class === "molongui-clearfix" ||
                             domNode.attribs.id?.startsWith("mab-") ||
-                            domNode.attribs?.class?.includes("wp-embed")
+                            domNode.attribs?.class?.includes("wp-embed") ||
+                            domNode.attribs?.class?.includes("ead-preview")
                         ) {
                             return <></>;
                         }
@@ -121,7 +117,11 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
 
                     case "em":
                         return (
-                            <ArticleText textStyle="italic">
+                            <ArticleText
+                                textColor=""
+                                textSize=""
+                                textStyle="italic"
+                            >
                                 {" "}
                                 {parseChildren()}{" "}
                             </ArticleText>
@@ -129,7 +129,12 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
 
                     case "strong":
                         return (
-                            <ArticleText fontWeight="font-semibold">
+                            <ArticleText
+                                textColor=""
+                                textSize=""
+                                textStyle=""
+                                fontWeight="font-semibold"
+                            >
                                 {" "}
                                 {parseChildren()}{" "}
                             </ArticleText>
@@ -151,7 +156,12 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
 
                         return (
                             <RegisterViewPortAwareness storyId={id} hash={hash}>
-                                <ArticleText margin="mb-2" padding="p-2">
+                                <ArticleText
+                                    textSize="text-base"
+                                    textColor="text-slate-800"
+                                    margin="mb-2"
+                                    padding="p-2"
+                                >
                                     {parseChildren()}
                                 </ArticleText>
                             </RegisterViewPortAwareness>
@@ -177,13 +187,19 @@ export async function parseArticle({
     const dom = parse(await response.text());
     const div = dom.getElementById("old-post");
 
-    const coverImage = htmlToReactParser(
-        dom
-            .querySelector(".featured-image")
-            .getElementsByTagName("img")
-            .toString(),
-        getOptions({ id }).options
-    ) as JSX.Element;
+    const coverImageElement = dom
+        .querySelector(".featured-image")
+        .getElementsByTagName("img");
+
+    const coverImage =
+        Array.isArray(coverImageElement) && coverImageElement.length > 0 ? (
+            (htmlToReactParser(
+                coverImageElement.toString(),
+                getOptions({ id }).options
+            ) as JSX.Element)
+        ) : (
+            <></>
+        );
 
     const { options, paragraph } = getOptions({ id });
     const restOfBody = htmlToReactParser(

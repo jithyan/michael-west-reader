@@ -1,4 +1,5 @@
 import { View, Pressable, Text, Image } from "react-native";
+import { Show } from "~core/components";
 import { ArticleDescription } from "./articles-list-page-parser";
 import { ReadProgress } from "./ReadProgress";
 
@@ -31,10 +32,12 @@ export function NewsItem({
                 <Text className="text-zinc-800 bg-amber-500 text-center text-xs rounded-t-md">
                     News
                 </Text>
-                <Image
-                    className="aspect-square rounded-b-md"
-                    source={{ uri: imageURL }}
-                />
+                <Show when={imageURL.length > 1}>
+                    <Image
+                        className="aspect-square rounded-b-md"
+                        source={{ uri: imageURL }}
+                    />
+                </Show>
             </View>
         </>
     );

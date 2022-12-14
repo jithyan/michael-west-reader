@@ -32,28 +32,43 @@ export function Show({
     return when ? children : elseShow;
 }
 
+function toClassName(...classNames: string[]): string {
+    return classNames
+        .map((c) => c.trim())
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+}
+
+type ArticleTextProps = {
+    children: ReactNode;
+    fontWeight?: FontWeight | "";
+    textSize?: TextSize | "";
+    textStyle?: TextStyle | "";
+    textColor?: TextColor | "";
+    padding?: Padding | "";
+    margin?: Margin | "";
+};
+
 export function ArticleText({
     children,
     textSize = "text-base",
     fontWeight = "font-normal",
-    textStyle,
+    textStyle = "",
     textColor = "text-slate-800",
     padding = "p-2",
     margin = "mb-2",
-}: {
-    children: ReactNode;
-    fontWeight?: FontWeight;
-    textSize?: TextSize;
-    textStyle?: TextStyle;
-    textColor?: TextColor;
-    padding?: Padding;
-    margin?: Margin;
-}) {
+}: ArticleTextProps) {
     return (
         <Text
-            className={`${textSize} ${fontWeight} ${
-                textStyle ?? ""
-            } ${textColor} ${margin} ${padding}`}
+            className={toClassName(
+                textSize,
+                fontWeight,
+                textStyle,
+                textColor,
+                padding,
+                margin
+            )}
         >
             {children}
         </Text>
