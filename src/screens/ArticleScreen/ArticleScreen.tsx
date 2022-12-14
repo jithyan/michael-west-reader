@@ -42,12 +42,12 @@ export function ArticleScreen({ route }: ArticleProps) {
     return (
         <SafeAreaView className="container bg-zinc-200 p-1">
             <View>
-                <Show when={process.env.NODE_ENV === "development"}>
+                <Show when={false}>
                     <DebugReadProgress id={id} />
                 </Show>
                 <IOScrollView>
                     <ScrollView className="p-1">
-                        <Text className="px-2 mt-2 mb-0.5 text-2xl font-extrabold">
+                        <Text className="px-2 mt-0.5 mb-0.5 text-2xl font-extrabold">
                             {title}
                         </Text>
                         <React.Suspense
@@ -67,7 +67,7 @@ export function ArticleScreen({ route }: ArticleProps) {
 
 function SupportMichaelWestSection() {
     return (
-        <View className=" flex-none flex-col bg-amber-600 rounded-md p-4 -mt-4 mb-4">
+        <View className=" flex-none flex-col bg-amber-600 rounded-md p-4 -mt-2 mb-4">
             <Pressable
                 onPress={() => {
                     Linking.openURL("https://michaelwest.com.au/support-us/");
