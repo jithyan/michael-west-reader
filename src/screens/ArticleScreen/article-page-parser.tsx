@@ -8,6 +8,8 @@ import htmlToReactParser, {
 import { h64 } from "xxhashjs";
 import { ArticleDescription } from "~screens/LatestArticlesScreen/articles-list-page-parser";
 import { RegisterViewPortAwareness } from "./RegisterViewPortAwareness";
+import { ARTICLE_SECTION_READ_SEED } from "~core/seeds";
+import { ArticleText } from "~core/components";
 
 type ElemParser = (
     domNode: Element,
@@ -45,7 +47,7 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                         return <></>;
 
                     case "span":
-                        return <Text>{parseChildren()}</Text>;
+                        return <>{parseChildren()}</>;
 
                     case "a":
                         if ((domNode.firstChild as any)?.name === "img") {
@@ -59,40 +61,41 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                                 onPress={() => {
                                     Linking.openURL(href);
                                 }}
-                                className="pl-1 pt-3.5"
                             >
-                                <Text className="text-base font-normal text-sky-600 underline">
+                                <ArticleText
+                                    textColor="text-sky-600"
+                                    textStyle="underline"
+                                    padding="pt-4"
+                                    margin="mx-2"
+                                >
                                     {parseChildren()}
-                                </Text>
+                                </ArticleText>
                             </Pressable>
                         );
 
                     case "div":
-                        if (domNode.attribs?.class === "molongui-clearfix") {
-                            return <></>;
-                        }
-                        if (domNode.attribs.id?.startsWith("mab-")) {
-                            return <></>;
-                        }
-                        if (domNode.attribs?.class?.includes("wp-embed")) {
-                            console.log("dom", domNode.attribs?.class);
+                        if (
+                            domNode.attribs?.class === "molongui-clearfix" ||
+                            domNode.attribs.id?.startsWith("mab-") ||
+                            domNode.attribs?.class?.includes("wp-embed")
+                        ) {
                             return <></>;
                         }
                         return <>{parseChildren()}</>;
 
-                    case "h1":
-                        return (
-                            <Text className=" text-purple-800 text-2xl font-extrabold">
-                                {parseChildren()}
-                            </Text>
-                        );
-
                     case "h2":
                     case "h3":
+                    case "h4":
+                    case "h5":
+                    case "h6":
                         return (
-                            <Text className="text-lg font-bold mb-2 px-2 pt-1.5">
+                            <ArticleText
+                                textSize="text-lg"
+                                fontWeight="font-bold"
+                                padding="p-1.5"
+                            >
                                 {parseChildren()}
-                            </Text>
+                            </ArticleText>
                         );
 
                     case "img":
@@ -107,17 +110,18 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
 
                     case "em":
                         return (
-                            <Text className="text-md italic">
+                            <ArticleText textStyle="italic">
                                 {" "}
                                 {parseChildren()}{" "}
-                            </Text>
+                            </ArticleText>
                         );
+
                     case "strong":
                         return (
-                            <Text className="text-md font-semibold">
+                            <ArticleText fontWeight="font-semibold">
                                 {" "}
                                 {parseChildren()}{" "}
-                            </Text>
+                            </ArticleText>
                         );
 
                     case "p":
@@ -127,15 +131,18 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                         paragraph.count++;
 
                         const hash = textNodes
-                            .reduce((prev, curr) => prev.update(curr), h64(256))
+                            .reduce(
+                                (prev, curr) => prev.update(curr),
+                                h64(ARTICLE_SECTION_READ_SEED)
+                            )
                             .digest()
                             .toString();
 
                         return (
                             <RegisterViewPortAwareness storyId={id} hash={hash}>
-                                <Text className=" text-base font-normal mb-2 p-2">
+                                <ArticleText margin="mb-2" padding="p-2">
                                     {parseChildren()}
-                                </Text>
+                                </ArticleText>
                             </RegisterViewPortAwareness>
                         );
 

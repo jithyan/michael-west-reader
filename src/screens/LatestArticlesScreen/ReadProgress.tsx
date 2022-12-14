@@ -3,6 +3,8 @@ import { useRecoilValue } from "recoil";
 import { currentArticleReadingProgressSelector } from "~screens/ArticleScreen/article-state";
 import { FilledTick, Eye } from "~core/icons";
 import { ArticleDescription } from "./articles-list-page-parser";
+import { TextColor } from "~types/tailwind";
+import { ArticleText } from "~core/components";
 
 function ProgressRow({
     icon,
@@ -11,14 +13,20 @@ function ProgressRow({
 }: {
     icon: JSX.Element;
     text: string;
-    textColor?: string;
+    textColor?: TextColor;
 }) {
     return (
         <View className="flex-initial flex-row mx-2 my-2">
             <View className="mx-1">{icon}</View>
-            <Text className={`${textColor} font-light text-xs pt-1`}>
+            <ArticleText
+                fontWeight="font-light"
+                textSize="text-xs"
+                padding="p-1"
+                margin="m-0"
+                textColor={textColor}
+            >
                 {text}
-            </Text>
+            </ArticleText>
         </View>
     );
 }
