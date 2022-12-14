@@ -8,8 +8,7 @@ import { RootStackParamList } from "../../App";
 import { LoadingSpinner, Show } from "~core/components";
 import { DebugStats } from "~core/debug";
 import { latestArticlesList } from "./articles-list-state";
-import { Article } from "./article-list-item-components";
-import { DateItem, MichaelWestSVG } from "./other-list-item-components";
+import { ArticleItem, DateItem, MichaelWestSVG } from "./list-item-components";
 
 function toArticleProps(
     articles: ArticleDescription[],
@@ -77,7 +76,7 @@ type ListItemProps = ArticleProps | DateItemProps | StaticItemProps;
 function ListItem(props: ListItemProps) {
     switch (props.type) {
         case "article":
-            return <Article {...props} />;
+            return <ArticleItem {...props} />;
 
         case "date":
             return <DateItem {...props} />;
