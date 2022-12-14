@@ -9,6 +9,11 @@ import { h64 } from "xxhashjs";
 import { ArticleDescription } from "~screens/LatestArticlesScreen/articles-list-page-parser";
 import { RegisterViewPortAwareness } from "./RegisterViewPortAwareness";
 
+type ElemParser = (
+    domNode: Element,
+    meta: { storyId: string; paragraph: { count: number } }
+) => void;
+
 const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
     const paragraph = { count: 0 };
     const options: HTMLReactParserOptions = {
@@ -100,7 +105,13 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                             </View>
                         );
 
-                    case "emphasis":
+                    case "em":
+                        return (
+                            <Text className="text-md italic">
+                                {" "}
+                                {parseChildren()}{" "}
+                            </Text>
+                        );
                     case "strong":
                         return (
                             <Text className="text-md font-semibold">
