@@ -4,6 +4,7 @@ import htmlToReactParser, {
     HTMLReactParserOptions,
     Element,
     domToReact,
+    DOMNode,
 } from "html-react-parser";
 import { h64 } from "xxhashjs";
 import { ArticleDescription } from "~screens/LatestArticlesScreen/articles-list-page-parser";
@@ -16,17 +17,27 @@ type ElemParser = (
     meta: { storyId: string; paragraph: { count: number } }
 ) => void;
 
+function isTextNodeWithData(
+    domNode: DOMNode
+): domNode is DOMNode & { data: string } {
+    return (
+        domNode.nodeType === NodeType.TEXT_NODE &&
+        typeof (domNode as any).data === "string" &&
+        (domNode as any).data.trim() !== ""
+    );
+}
+
+function isAnElementWithAttribs(domNode: DOMNode): domNode is Element {
+    return domNode instanceof Element && typeof domNode.attribs === "object";
+}
+
 const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
     const paragraph = { count: 0 };
     const options: HTMLReactParserOptions = {
         replace: (domNode) => {
-            if (
-                domNode.nodeType === NodeType.TEXT_NODE &&
-                typeof (domNode as any).data === "string" &&
-                (domNode as any).data.trim() !== ""
-            ) {
-                return <Text>{(domNode as any).data.trim()}</Text>;
-            } else if (domNode instanceof Element && domNode.attribs) {
+            if (isTextNodeWithData(domNode)) {
+                return <Text>{domNode.data.trim()}</Text>;
+            } else if (isAnElementWithAttribs(domNode)) {
                 const { name } = domNode;
                 const { children } = domNode;
 
