@@ -23,9 +23,7 @@ export default function App() {
                         name="LatestArticlesList"
                         component={LatestArticlesScreen}
                         options={{
-                            header: () => (
-                                <View className="bg-sky-900 p-2"></View>
-                            ),
+                            header: () => <View className="bg-sky-900"></View>,
                         }}
                     />
                     <Stack.Screen

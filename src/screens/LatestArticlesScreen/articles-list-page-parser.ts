@@ -123,8 +123,11 @@ export function parseLatestArticlesHTMLPage(
         return uniqueArticles;
     } catch (e) {
         console.log(e);
-        throw new ParsingError(`Error parsing page for category ${category}`, {
-            cause: e,
-        });
+        throw new ParsingError(
+            `Error parsing page for category ${category}: ${e}`,
+            {
+                cause: e,
+            }
+        );
     }
 }

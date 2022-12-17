@@ -1,8 +1,12 @@
 import { View, Pressable, Text, Image } from "react-native";
+import FastImageTemp from "react-native-fast-image";
 import { SvgCssUri } from "react-native-svg";
 import { Show } from "~core/components";
 import { ArticleDescription } from "./articles-list-page-parser";
 import { ReadProgress } from "./ReadProgress";
+
+const FastImage =
+    process.env.NODE_ENV === "development" ? Image : FastImageTemp;
 
 export const MichaelWestSVG = (
     <View className="p-0 my-2 mx-6 bg-slate-200 rounded-xl flex-shrink flex-row border-solid">
@@ -56,7 +60,7 @@ function NewsItem({
                     News
                 </Text>
                 <Show when={imageURL.length > 1}>
-                    <Image
+                    <FastImage
                         className="aspect-square rounded-b-md"
                         source={{ uri: imageURL }}
                     />
@@ -80,7 +84,7 @@ function StoryItem({
                     Story
                 </Text>
                 <View className=" basis-full my-0.5">
-                    <Image
+                    <FastImage
                         className="aspect-video rounded-md"
                         source={{ uri: imageURL }}
                     />

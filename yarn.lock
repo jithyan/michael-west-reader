@@ -6743,6 +6743,7 @@ __metadata:
     prettier: ^2.8.0
     react: 18.1.0
     react-native: 0.70.5
+    react-native-fast-image: ^8.6.3
     react-native-intersection-observer: ^0.0.9
     react-native-loading-spinner-overlay: ^3.0.1
     react-native-safe-area-context: 4.4.1
@@ -8032,6 +8033,16 @@ __metadata:
     jscodeshift: ^0.13.1
     nullthrows: ^1.1.1
   checksum: 2a50ad71e09bc8cbb3694057cf47d6e9665c16f3968d1dc2b71e83c8c4e7be3b07b74bea08750ec9c8f6c60e6c746a5f695963c8694e5a76edcbce35a53a6a06
+  languageName: node
+  linkType: hard
+
+"react-native-fast-image@npm:^8.6.3":
+  version: 8.6.3
+  resolution: "react-native-fast-image@npm:8.6.3"
+  peerDependencies:
+    react: ^17 || ^18
+    react-native: ">=0.60.0"
+  checksum: 29289cb6b2eae0983c8922b22e2d9de3be07322bb7991c5def19f95eadefaedb0e308ff0b38cc1d0444e8bd4fe94a7621a99a2d3d9298100bcb60b3144677234
   languageName: node
   linkType: hard
 
