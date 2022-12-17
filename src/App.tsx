@@ -5,6 +5,7 @@ import { InitializeApp } from "./InitializeApp";
 import { ArticleScreen } from "~screens/ArticleScreen/ArticleScreen";
 import { ArticleDescription } from "~screens/LatestArticlesScreen/articles-list-page-parser";
 import { LatestArticlesScreen } from "~screens/LatestArticlesScreen/LatestArticlesScreen";
+import { View } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,12 +18,14 @@ export default function App() {
     return (
         <InitializeApp>
             <NavigationContainer>
-                <Stack.Navigator>
+                <Stack.Navigator initialRouteName="LatestArticlesList">
                     <Stack.Screen
                         name="LatestArticlesList"
                         component={LatestArticlesScreen}
                         options={{
-                            header: () => <></>,
+                            header: () => (
+                                <View className="bg-sky-900 p-2"></View>
+                            ),
                         }}
                     />
                     <Stack.Screen

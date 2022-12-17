@@ -5,6 +5,45 @@ import { Category } from "./articles-list-page-api";
 import { h64 } from "xxhashjs";
 import { ARTICLE_ID_SEED } from "~core/seeds";
 
+export interface ArticleDescription {
+    title: string;
+    id: string;
+    imageURL: string;
+    summary: string;
+    published: string;
+    author: string;
+    storyURL: string;
+    category: Category;
+    date: Date;
+}
+
+function parseArticle(
+    article: HTMLElement,
+    category: Category
+): ArticleDescription {
+    return Article(article, category);
+}
+
+function Article(article: HTMLElement, category: Category): ArticleDescription {
+    const { storyURL, title, id } = extractTitleIdAndURLFromArticle(article);
+    const published = extractPublishedDateFromArticle(article);
+
+    return {
+        title,
+        id,
+        storyURL,
+        category,
+        published,
+        imageURL: extractImageURLFromArticle(article),
+        summary: extractSummaryFromArticle(article),
+        author: extractAuthorFromArticle(article),
+        date:
+            category === "news"
+                ? parseDateWithTime(published)
+                : parseDateWithoutTime(published),
+    };
+}
+
 export function isArticleDescription(obj: any): obj is ArticleDescription {
     return (
         typeof obj === "object" &&
@@ -23,55 +62,6 @@ function parseDateWithoutTime(dateString: string): Date {
 
 function parseDateWithTime(dateString: string): Date {
     return dateParse(dateString, "MMMM d, yyyy HH:mm", new Date());
-}
-
-class Article implements ArticleDescription {
-    readonly title: string;
-    readonly id: string;
-    readonly imageURL: string;
-    readonly summary: string;
-    readonly published: string;
-    readonly author: string;
-    readonly storyURL: string;
-    readonly category: Category;
-    readonly date: Date;
-
-    constructor(article: HTMLElement, category: Category) {
-        const { storyURL, title, id } =
-            extractTitleIdAndURLFromArticle(article);
-
-        this.title = title;
-        this.id = id;
-        this.storyURL = storyURL;
-        this.imageURL = extractImageURLFromArticle(article);
-        this.summary = extractSummaryFromArticle(article);
-        this.published = extractPublishedDateFromArticle(article);
-        this.author = extractAuthorFromArticle(article);
-        this.category = category;
-        this.date =
-            category === "news"
-                ? parseDateWithTime(this.published)
-                : parseDateWithoutTime(this.published);
-    }
-}
-
-export interface ArticleDescription {
-    title: string;
-    id: string;
-    imageURL: string;
-    summary: string;
-    published: string;
-    author: string;
-    storyURL: string;
-    category: Category;
-    date: Date;
-}
-
-function parseArticle(
-    article: HTMLElement,
-    category: Category
-): ArticleDescription {
-    return new Article(article, category);
 }
 
 function extractTitleIdAndURLFromArticle(article: HTMLElement): {
