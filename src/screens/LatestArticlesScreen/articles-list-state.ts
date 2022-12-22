@@ -1,5 +1,6 @@
 import { compareDesc } from "date-fns";
-import { selector } from "recoil";
+import { atom, selector, useRecoilState } from "recoil";
+import { paragraphsReadAtom } from "~screens/ArticleScreen/article-state";
 import {
     Category,
     getLatestArticlesHTMLPageForCategory,
@@ -12,7 +13,7 @@ const fetchAndParseArticles = (category: Category, pageNumber: number) =>
             parseLatestArticlesHTMLPage(latestNewsPageBody, category)
     );
 
-export const latestArticlesList = selector({
+export const latestArticlesListSelector = selector({
     key: "latestArticlesList",
     get: async () => {
         const articles = await Promise.all([
@@ -40,3 +41,56 @@ export const latestArticlesList = selector({
         return uniqueArticles;
     },
 });
+
+export const filteredArticlesSelector = selector({
+    key: "filteredArticles",
+    get: async ({ get }) => {
+        const articles = get(latestArticlesListSelector);
+        const storiesOnly = get(storiesOnlyAtom);
+        const unreadOnly = get(unreadOnlyAtom);
+
+        if (!storiesOnly && !unreadOnly) {
+            return articles;
+        }
+
+        const paragraphsRead = get(paragraphsReadAtom);
+
+        if (storiesOnly && unreadOnly) {
+            return articles.filter(
+                (a) =>
+                    storiesOnly &&
+                    unreadOnly &&
+                    a.category === "story" &&
+                    paragraphsRead.get(a.id, 0) < 1
+            );
+        }
+
+        return articles.filter(
+            (a) =>
+                (storiesOnly && a.category === "story") ||
+                (unreadOnly && paragraphsRead.get(a.id, 0) < 1)
+        );
+    },
+});
+
+const storiesOnlyAtom = atom({
+    key: "storiesOnlyAtom",
+    default: false,
+});
+
+const unreadOnlyAtom = atom({
+    key: "unreadOnlyAtom",
+    default: false,
+});
+
+export function useFilterState() {
+    const [storiesOnly, setStoriesOnly] = useRecoilState(storiesOnlyAtom);
+    const [unreadOnly, setUnreadOnly] = useRecoilState(unreadOnlyAtom);
+
+    return {
+        storiesOnly,
+        unreadOnly,
+        setStoriesOnly,
+        setUnreadOnly,
+    };
+}

@@ -7,8 +7,13 @@ import { ArticleDescription } from "./articles-list-page-parser";
 import { RootStackParamList } from "../../App";
 import { LoadingSpinner, Show } from "~core/components";
 import { DebugStats } from "~core/debug";
-import { latestArticlesList } from "./articles-list-state";
-import { ArticleItem, DateItem, MichaelWestSVG } from "./list-item-components";
+import { filteredArticlesSelector } from "./articles-list-state";
+import {
+    ArticleItem,
+    DateItem,
+    MichaelWestSVG,
+    FilterAndResetButtonItem,
+} from "./list-item-components";
 
 function toArticleProps(
     articles: ArticleDescription[],
@@ -45,6 +50,17 @@ function toStaticItemProp(key: string, element: JSX.Element): StaticItemProps {
     };
 }
 
+function toStaticComponentItemProp(
+    key: string,
+    Component: () => JSX.Element
+): StaticComponentItemProps {
+    return {
+        type: "static-component",
+        key,
+        Component,
+    };
+}
+
 function groupArticlePropsByDateItemProps(
     articles: ArticleProps[]
 ): Array<ArticleProps | DateItemProps> {
@@ -70,8 +86,17 @@ type ArticleProps = ArticleDescription & {
 };
 type DateItemProps = { type: "date"; key: string; date: string };
 type StaticItemProps = { type: "static"; key: string; element: JSX.Element };
+type StaticComponentItemProps = {
+    type: "static-component";
+    key: string;
+    Component: () => JSX.Element;
+};
 
-type ListItemProps = ArticleProps | DateItemProps | StaticItemProps;
+type ListItemProps =
+    | ArticleProps
+    | DateItemProps
+    | StaticItemProps
+    | StaticComponentItemProps;
 
 function ListItem(props: ListItemProps) {
     switch (props.type) {
@@ -84,16 +109,23 @@ function ListItem(props: ListItemProps) {
         case "static":
             return props.element;
 
+        case "static-component":
+            const { Component } = props;
+            return <Component />;
+
         default:
             throw new Error(`Unknown list item type: ${props}`);
     }
 }
 
 function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
-    const latestStories = useRecoilValue(latestArticlesList);
+    const latestStories = useRecoilValue(filteredArticlesSelector);
     const listItems: ListItemProps[] = useMemo(
         () => [
             toStaticItemProp("michael-west-svg", MichaelWestSVG),
+            toStaticComponentItemProp("reset", () => (
+                <FilterAndResetButtonItem />
+            )),
             ...groupArticlePropsByDateItemProps(
                 toArticleProps(latestStories, navigation)
             ),

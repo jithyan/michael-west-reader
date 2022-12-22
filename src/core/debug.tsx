@@ -9,7 +9,7 @@ import {
     paragraphsReadAtom,
     totalNumParagraphsAtom,
 } from "~screens/ArticleScreen/article-state";
-import { latestArticlesList } from "~screens/LatestArticlesScreen/articles-list-state";
+import { latestArticlesListSelector } from "~screens/LatestArticlesScreen/articles-list-state";
 
 export function DebugReadProgress({ id }: { id: string }) {
     const numRead = useRecoilValue(paragraphsReadForCurrentArticleSelector(id));
@@ -28,7 +28,7 @@ export function DebugReadProgress({ id }: { id: string }) {
 
 export function DebugStats() {
     const [storage, setStorage] = useState<number>(0);
-    const latestArticles = useRecoilValue(latestArticlesList);
+    const latestArticles = useRecoilValue(latestArticlesListSelector);
     const totalNumParagraphs = useRecoilValue(totalNumParagraphsAtom);
     const paragraphsRead = useRecoilValue(paragraphsReadAtom);
 

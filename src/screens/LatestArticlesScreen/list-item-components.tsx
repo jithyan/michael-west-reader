@@ -1,8 +1,13 @@
 import { View, Pressable, Text, Image } from "react-native";
 import FastImageTemp from "react-native-fast-image";
 import { SvgCssUri } from "react-native-svg";
-import { Show } from "~core/components";
+import { useRecoilRefresher_UNSTABLE } from "recoil";
+import { ArticleText, Show } from "~core/components";
 import { ArticleDescription } from "./articles-list-page-parser";
+import {
+    latestArticlesListSelector,
+    useFilterState,
+} from "./articles-list-state";
 import { ReadProgress } from "./ReadProgress";
 
 const FastImage =
@@ -26,6 +31,44 @@ export function DateItem({ date }: { date: string }) {
             <Text className="text-zinc-800 font-extrabold text-md mr-1">
                 {date}
             </Text>
+        </View>
+    );
+}
+
+export function FilterAndResetButtonItem() {
+    const reset = useRecoilRefresher_UNSTABLE(latestArticlesListSelector);
+    const { setStoriesOnly, setUnreadOnly, storiesOnly, unreadOnly } =
+        useFilterState();
+
+    return (
+        <View className="flex-row flex-initial">
+            <Pressable onPress={reset}>
+                <View className="basis-1/3">
+                    <ArticleText>Refresh</ArticleText>
+                </View>
+            </Pressable>
+            <Pressable onPress={() => setStoriesOnly((prev) => !prev)}>
+                <View className="basis-1/3">
+                    <ArticleText
+                        textColor={
+                            storiesOnly ? "text-amber-400" : "text-slate-200"
+                        }
+                    >
+                        Stories only
+                    </ArticleText>
+                </View>
+            </Pressable>
+            <Pressable onPress={() => setUnreadOnly((prev) => !prev)}>
+                <View className="basis-1/3">
+                    <ArticleText
+                        textColor={
+                            unreadOnly ? "text-amber-400" : "text-slate-200"
+                        }
+                    >
+                        Unread only
+                    </ArticleText>
+                </View>
+            </Pressable>
         </View>
     );
 }

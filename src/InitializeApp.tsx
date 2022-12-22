@@ -6,7 +6,7 @@ import {
     paragraphsReadAtom,
     totalNumParagraphsAtom,
 } from "~screens/ArticleScreen/article-state";
-import { latestArticlesList } from "~screens/LatestArticlesScreen/articles-list-state";
+import { latestArticlesListSelector } from "~screens/LatestArticlesScreen/articles-list-state";
 
 export function InitializeApp({ children }: { children: JSX.Element }) {
     return (
@@ -30,7 +30,7 @@ function LoadAtomsSyncedToStorage({ children }: { children: JSX.Element }) {
 }
 
 function PruneItemsFromStorage() {
-    const latestStories = useRecoilValue(latestArticlesList);
+    const latestStories = useRecoilValue(latestArticlesListSelector);
     const setParagraphsRead = useSetRecoilState(paragraphsReadAtom);
     const setTotalParagraphs = useSetRecoilState(totalNumParagraphsAtom);
 
