@@ -35,40 +35,62 @@ export function DateItem({ date }: { date: string }) {
     );
 }
 
+function FilterButton({
+    isEnabled,
+    onPress,
+    label,
+}: {
+    isEnabled: boolean;
+    onPress: () => void;
+    label: string;
+}) {
+    return (
+        <Pressable onPress={onPress}>
+            <View
+                className={`basis-1/3 border-solid border-2 border-yellow-600 mx-1.5 px-1 rounded-md ${
+                    isEnabled ? "bg-orange-400" : "bg-slate-900"
+                }`}
+            >
+                <ArticleText
+                    textColor={isEnabled ? "text-gray-800" : "text-slate-200"}
+                    fontWeight="font-bold"
+                    textSize="text-sm"
+                >
+                    {label}
+                </ArticleText>
+            </View>
+        </Pressable>
+    );
+}
+
 export function FilterAndResetButtonItem() {
     const reset = useRecoilRefresher_UNSTABLE(latestArticlesListSelector);
     const { setStoriesOnly, setUnreadOnly, storiesOnly, unreadOnly } =
         useFilterState();
 
     return (
-        <View className="flex-row flex-initial">
+        <View className="flex-row flex-initial my-3">
             <Pressable onPress={reset}>
-                <View className="basis-1/3">
-                    <ArticleText>Refresh</ArticleText>
-                </View>
-            </Pressable>
-            <Pressable onPress={() => setStoriesOnly((prev) => !prev)}>
-                <View className="basis-1/3">
+                <View className="basis-1/3 px-1 mx-1.5 rounded-md border-2 bg-teal-600 border-sky-900">
                     <ArticleText
-                        textColor={
-                            storiesOnly ? "text-amber-400" : "text-slate-200"
-                        }
+                        textColor="text-gray-300"
+                        textSize="text-sm"
+                        fontWeight="font-bold"
                     >
-                        Stories only
+                        Refresh
                     </ArticleText>
                 </View>
             </Pressable>
-            <Pressable onPress={() => setUnreadOnly((prev) => !prev)}>
-                <View className="basis-1/3">
-                    <ArticleText
-                        textColor={
-                            unreadOnly ? "text-amber-400" : "text-slate-200"
-                        }
-                    >
-                        Unread only
-                    </ArticleText>
-                </View>
-            </Pressable>
+            <FilterButton
+                label="Stories only"
+                onPress={() => setStoriesOnly((prev) => !prev)}
+                isEnabled={storiesOnly}
+            />
+            <FilterButton
+                label="Unread only"
+                onPress={() => setUnreadOnly((prev) => !prev)}
+                isEnabled={unreadOnly}
+            />
         </View>
     );
 }
