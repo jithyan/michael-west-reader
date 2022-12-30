@@ -55,6 +55,7 @@ function FilterButton({
                     textColor={isEnabled ? "text-gray-800" : "text-slate-200"}
                     fontWeight="font-bold"
                     textSize="text-sm"
+                    padding="px-2 py-1"
                 >
                     {label}
                 </ArticleText>
@@ -63,19 +64,20 @@ function FilterButton({
     );
 }
 
-export function FilterAndResetButtonItem() {
+export function FilterAndResetButtonItem(): JSX.Element {
     const reset = useRecoilRefresher_UNSTABLE(latestArticlesListSelector);
     const { setStoriesOnly, setUnreadOnly, storiesOnly, unreadOnly } =
         useFilterState();
 
     return (
-        <View className="flex-row flex-initial my-3">
+        <View className="flex flex-row items-center my-3">
             <Pressable onPress={reset}>
-                <View className="basis-1/3 px-1 mx-1.5 rounded-md border-2 bg-teal-600 border-sky-900">
+                <View className="basis-1/3 mx-1.5 rounded-md border-2 bg-teal-600 border-zinc-200">
                     <ArticleText
                         textColor="text-gray-300"
                         textSize="text-sm"
                         fontWeight="font-bold"
+                        padding="px-2 py-1"
                     >
                         Refresh
                     </ArticleText>

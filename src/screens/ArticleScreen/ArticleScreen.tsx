@@ -1,11 +1,18 @@
-import { View, Text, ScrollView, Pressable, Linking } from "react-native";
+import {
+    View,
+    Text,
+    ScrollView,
+    Pressable,
+    Linking,
+    Share,
+} from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect } from "react";
 import { selectorFamily, useRecoilValue, useSetRecoilState } from "recoil";
 import { IOScrollView } from "react-native-intersection-observer";
 import { RootStackParamList } from "../../App";
-import { LoadingSpinner, Show } from "~core/components";
+import { ArticleText, LoadingSpinner, Show } from "~core/components";
 import { ArticleDescription } from "~screens/LatestArticlesScreen/articles-list-page-parser";
 import { DebugReadProgress } from "~core/debug";
 import { totalParagraphsForCurrentArticleSelector } from "./article-state";
@@ -50,6 +57,7 @@ export function ArticleScreen({ route }: ArticleProps) {
                         <Text className="px-2 mt-0.5 mb-0.5 text-2xl font-extrabold">
                             {title}
                         </Text>
+                        <ShareArticle storyURL={storyURL} />
                         <React.Suspense
                             fallback={
                                 <LoadingSpinner text="Loading article..." />
@@ -62,6 +70,34 @@ export function ArticleScreen({ route }: ArticleProps) {
                 </IOScrollView>
             </View>
         </SafeAreaView>
+    );
+}
+
+function ShareArticle({ storyURL }: { storyURL: string }) {
+    return (
+        <View className="flex items-start mt-2 ml-2">
+            <Pressable
+                onPress={() => {
+                    Share.share({ url: storyURL, message: storyURL });
+                }}
+            >
+                <ArticleText
+                    textColor="text-gray-700"
+                    textSize="text-xs"
+                    fontWeight="font-bold"
+                    textStyle="underline"
+                    otherClassNames={[
+                        "rounded-md",
+                        "border-solid",
+                        "border-2",
+                        "border-gray-600",
+                        "p-1",
+                    ]}
+                >
+                    Share article
+                </ArticleText>
+            </Pressable>
+        </View>
     );
 }
 

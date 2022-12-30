@@ -107,7 +107,7 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
 
                     case "img":
                         return (
-                            <View className="my-8 px-2">
+                            <View className="my-4 px-2">
                                 <Image
                                     source={{ uri: domNode.attribs.src }}
                                     className="aspect-video"

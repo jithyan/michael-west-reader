@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import Spinner from "react-native-loading-spinner-overlay/lib";
 import {
     TextSize,
@@ -46,8 +46,9 @@ type ArticleTextProps = {
     textSize?: TextSize | "";
     textStyle?: TextStyle | "";
     textColor?: TextColor | "";
-    padding?: Padding | "";
+    padding?: Padding | "" | `${Padding} ${Padding}`;
     margin?: Margin | "";
+    otherClassNames?: string[];
 };
 
 export function ArticleText({
@@ -58,6 +59,7 @@ export function ArticleText({
     textColor = "text-slate-800",
     padding = "p-2",
     margin = "mb-2",
+    otherClassNames = [],
 }: ArticleTextProps) {
     return (
         <Text
@@ -67,7 +69,8 @@ export function ArticleText({
                 textStyle,
                 textColor,
                 padding,
-                margin
+                margin,
+                ...otherClassNames
             )}
         >
             {children}

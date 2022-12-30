@@ -123,9 +123,7 @@ function LatestArticles({ navigation }: Pick<HomeProps, "navigation">) {
     const listItems: ListItemProps[] = useMemo(
         () => [
             toStaticItemProp("michael-west-svg", MichaelWestSVG),
-            toStaticComponentItemProp("reset", () => (
-                <FilterAndResetButtonItem />
-            )),
+            toStaticComponentItemProp("reset", FilterAndResetButtonItem),
             ...groupArticlePropsByDateItemProps(
                 toArticleProps(latestStories, navigation)
             ),
