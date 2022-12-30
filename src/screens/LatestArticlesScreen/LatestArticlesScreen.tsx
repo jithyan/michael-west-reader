@@ -148,7 +148,7 @@ type HomeProps = NativeStackScreenProps<
 
 export function LatestArticlesScreen({ route, navigation }: HomeProps) {
     return (
-        <SafeAreaView className="container bg-sky-900 px-4 py-4 mb-8">
+        <SafeAreaView className="bg-sky-900 px-4 py-4 mb-8">
             <Suspense
                 fallback={<LoadingSpinner text="Fetching latest articles..." />}
             >

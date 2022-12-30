@@ -8,10 +8,10 @@ import {
 } from "~screens/ArticleScreen/article-state";
 import { latestArticlesListSelector } from "~screens/LatestArticlesScreen/articles-list-state";
 
-export function InitializeApp({ children }: { children: JSX.Element }) {
+export function InitializeReader({ children }: { children: JSX.Element }) {
     return (
         <RecoilRoot>
-            <Suspense fallback={<LoadingSpinner text="Initializing..." />}>
+            <Suspense fallback={<LoadingSpinner text="Loading..." />}>
                 <LoadAtomsSyncedToStorage>
                     <>
                         <PruneItemsFromStorage />

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Pressable, Text } from "react-native";
+import { Text } from "react-native";
 import Spinner from "react-native-loading-spinner-overlay/lib";
 import {
     TextSize,
@@ -17,7 +17,15 @@ export function LoadingSpinner({
     text: string;
     visible?: boolean;
 }) {
-    return <Spinner visible={visible} textContent={text} />;
+    return (
+        <Spinner
+            color="#06b6d4"
+            textStyle={{ color: "white" }}
+            overlayColor="#0c4a6e"
+            visible={visible}
+            textContent={text}
+        />
+    );
 }
 
 export function Show({

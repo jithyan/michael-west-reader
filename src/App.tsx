@@ -1,7 +1,7 @@
 import { registerRootComponent } from "expo";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { InitializeApp } from "./InitializeApp";
+import { InitializeReader } from "./InitializeReader";
 import { ArticleScreen } from "~screens/ArticleScreen/ArticleScreen";
 import { ArticleDescription } from "~screens/LatestArticlesScreen/articles-list-page-parser";
 import { LatestArticlesScreen } from "~screens/LatestArticlesScreen/LatestArticlesScreen";
@@ -16,7 +16,7 @@ export type RootStackParamList = {
 
 export default function App() {
     return (
-        <InitializeApp>
+        <InitializeReader>
             <NavigationContainer>
                 <Stack.Navigator initialRouteName="LatestArticlesList">
                     <Stack.Screen
@@ -35,7 +35,7 @@ export default function App() {
                     />
                 </Stack.Navigator>
             </NavigationContainer>
-        </InitializeApp>
+        </InitializeReader>
     );
 }
 
