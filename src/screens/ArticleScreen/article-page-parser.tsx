@@ -140,7 +140,24 @@ const getOptions = ({ id }: Pick<ArticleDescription, "id">) => {
                             </ArticleText>
                         );
 
+                    case "i":
+                        return (
+                            <ArticleText
+                                textColor=""
+                                textSize=""
+                                textStyle="italic"
+                                fontWeight=""
+                            >
+                                {" "}
+                                {parseChildren()}{" "}
+                            </ArticleText>
+                        );
+
                     case "p":
+                        if ((domNode.firstChild as any)?.name === "a") {
+                            return <>{parseChildren()}</>;
+                        }
+
                         const textNodes = domNode.childNodes
                             .filter((n) => n.nodeType === NodeType.TEXT_NODE)
                             .map((n) => (n as any).data as string)
