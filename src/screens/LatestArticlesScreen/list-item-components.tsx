@@ -1,13 +1,9 @@
 import { View, Pressable, Text, Image } from "react-native";
 import FastImageTemp from "react-native-fast-image";
 import { SvgCssUri } from "react-native-svg";
-import { useRecoilRefresher_UNSTABLE } from "recoil";
 import { ArticleText, Show } from "~core/components";
 import { ArticleDescription } from "./articles-list-page-parser";
-import {
-    latestArticlesListSelector,
-    useFilterState,
-} from "./articles-list-state";
+import { useFilterState } from "./articles-list-state";
 import { ReadProgress } from "./ReadProgress";
 
 const FastImage =
@@ -47,7 +43,7 @@ function FilterButton({
     return (
         <Pressable onPress={onPress}>
             <View
-                className={`basis-1/3 border-solid border-2 border-yellow-600 mx-1.5 px-1 rounded-md ${
+                className={`border-solid border-2 border-yellow-600 mx-1.5 px-1 rounded-md ${
                     isEnabled ? "bg-orange-400" : "bg-slate-900"
                 }`}
             >
@@ -65,24 +61,11 @@ function FilterButton({
 }
 
 export function FilterAndResetButtonItem(): JSX.Element {
-    const reset = useRecoilRefresher_UNSTABLE(latestArticlesListSelector);
     const { setStoriesOnly, setUnreadOnly, storiesOnly, unreadOnly } =
         useFilterState();
 
     return (
         <View className="flex flex-row items-center my-3">
-            <Pressable onPress={reset}>
-                <View className="basis-1/3 mx-1.5 rounded-md border-2 bg-teal-600 border-zinc-200">
-                    <ArticleText
-                        textColor="text-gray-300"
-                        textSize="text-sm"
-                        fontWeight="font-bold"
-                        padding="px-2 py-1"
-                    >
-                        Refresh
-                    </ArticleText>
-                </View>
-            </Pressable>
             <FilterButton
                 label="Stories only"
                 onPress={() => setStoriesOnly((prev) => !prev)}
