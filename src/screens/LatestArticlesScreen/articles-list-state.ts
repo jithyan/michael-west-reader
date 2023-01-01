@@ -57,11 +57,7 @@ export const filteredArticlesSelector = selector({
 
         if (storiesOnly && unreadOnly) {
             return articles.filter(
-                (a) =>
-                    storiesOnly &&
-                    unreadOnly &&
-                    a.category === "story" &&
-                    paragraphsRead.get(a.id, 0) < 1
+                (a) => a.category === "story" && paragraphsRead.get(a.id, 0) < 1
             );
         }
 
