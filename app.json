@@ -24,7 +24,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/favicon.png",
-        "backgroundColor": "#081842"
+        "backgroundColor": "#f8fafc"
       },
       "package": "au.jithyan.michaelwestreader"
     },
