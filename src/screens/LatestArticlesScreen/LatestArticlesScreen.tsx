@@ -1,5 +1,5 @@
 import React, { Suspense, useMemo } from "react";
-import { SafeAreaView, FlatList } from "react-native";
+import { SafeAreaView, FlatList, View } from "react-native";
 import { useRecoilValue } from "recoil";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { format, getDayOfYear } from "date-fns";
@@ -148,15 +148,19 @@ type HomeProps = NativeStackScreenProps<
 
 export function LatestArticlesScreen({ route, navigation }: HomeProps) {
     return (
-        <SafeAreaView className="bg-sky-900 px-4 py-4 mb-8">
-            <Suspense
-                fallback={<LoadingSpinner text="Fetching latest articles..." />}
-            >
-                <Show when={process.env.NODE_ENV === "development"}>
-                    <DebugStats />
-                </Show>
-                <LatestArticles navigation={navigation} />
-            </Suspense>
+        <SafeAreaView className="bg-sky-900 w-full h-full">
+            <View className="px-4 pt-4">
+                <Suspense
+                    fallback={
+                        <LoadingSpinner text="Fetching latest articles..." />
+                    }
+                >
+                    <Show when={process.env.NODE_ENV === "development"}>
+                        <DebugStats />
+                    </Show>
+                    <LatestArticles navigation={navigation} />
+                </Suspense>
+            </View>
         </SafeAreaView>
     );
 }
