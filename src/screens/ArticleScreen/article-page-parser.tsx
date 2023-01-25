@@ -223,10 +223,21 @@ export async function parseArticle({
         );
 
     const { options, paragraph } = getOptions({ id });
-    const restOfBody = htmlToReactParser(
-        div.toString(),
-        options
-    ) as JSX.Element;
+
+    const restOfBody = div ? (
+        (htmlToReactParser(div?.toString() ?? "", options) as JSX.Element)
+    ) : (
+        <View className="bg-amber-800 m-2 mb-8">
+            <ArticleText
+                textSize="text-lg"
+                fontWeight="font-bold"
+                padding="p-4"
+                textColor="text-slate-100"
+            >
+                Failed to parse article. Please try reading another article or visiting the website itself.
+            </ArticleText>
+        </View>
+    );
 
     return {
         body: (
