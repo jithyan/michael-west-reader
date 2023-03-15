@@ -3,7 +3,7 @@
     "name": "michael-west-reader",
     "slug": "michael-west-reader",
     "entryPoint": "./src/App.tsx",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/dalle-m-logo.png",
     "userInterfaceStyle": "light",
