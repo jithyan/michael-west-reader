@@ -4,8 +4,7 @@
 
 Attempting to learn React Native by building a mobile specific reader for the excellent [Michael West](https://michaelwest.com.au) website.
 
-There are outstanding issues I need to resolve before Google will allow me to publish a news app to the Play Store, so it's not available to
-use from there. I've lost motivation to continue building this, as my primary purpose was to learn a bit of React Native.
+There are outstanding issues I need to resolve before Google will allow me to publish a news app to the Play Store, so unfortunately it can't be found there. I don't really have any motivation to address those issues, as my primary purpose was to learn a bit of React Native.
 
 ## Screens
 
